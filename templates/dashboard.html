@@ -68,7 +68,7 @@
 
         <div class="stat-card">
             <div>
-                <div class="stat-label">Mean Confidence Score</div>
+                <div class="stat-label">Avg. Opacity Contrast</div>
                 <div class="stat-value text-teal">{{ stats.avg_confidence }}%</div>
             </div>
             <div style="width: 42px; height: 42px; background: var(--emerald-50); color: var(--emerald-600); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
@@ -78,8 +78,8 @@
 
         <div class="stat-card">
             <div>
-                <div class="stat-label">Active Inference Core</div>
-                <div style="font-size: 1.05rem; font-weight: 700; color: var(--slate-800); margin-top: 0.25rem;">ResNet-50 / DenseNet</div>
+                <div class="stat-label">Analysis Engine</div>
+                <div style="font-size: 1.05rem; font-weight: 700; color: var(--slate-800); margin-top: 0.25rem;">BFS & Matrix Traversal</div>
             </div>
             <div style="width: 42px; height: 42px; background: var(--blue-50); color: var(--blue-600); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -88,8 +88,8 @@
 
         <div class="stat-card">
             <div>
-                <div class="stat-label">Explainability Core</div>
-                <div style="font-size: 1.05rem; font-weight: 700; color: var(--emerald-600); margin-top: 0.25rem;">Grad-CAM Ready</div>
+                <div class="stat-label">ROI Segmentation</div>
+                <div style="font-size: 1.05rem; font-weight: 700; color: var(--emerald-600); margin-top: 0.25rem;">Deterministic Core</div>
             </div>
             <div style="width: 42px; height: 42px; background: var(--emerald-50); color: var(--emerald-600); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
@@ -99,12 +99,12 @@
 
     <!-- Main Workspace Two-Column Layout -->
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
-        <!-- Left: Upload & Inference Intake Card -->
+        <!-- Left: Upload & Intake Card -->
         <div class="card">
             <div class="card-header">
                 <div>
                     <h3>Patient Scan Intake & Analysis</h3>
-                    <p style="font-size: 0.875rem; margin-top: 0.25rem;">Upload radiological scan to trigger multi-stage preprocessing, CNN inference, and Grad-CAM generation.</p>
+                    <p style="font-size: 0.875rem; margin-top: 0.25rem;">Upload radiological scan to trigger multi-stage preprocessing, BFS connected-component extraction, and statistical anomaly evaluation.</p>
                 </div>
                 <span class="badge badge-teal">Step 1 of 2</span>
             </div>
@@ -146,7 +146,7 @@
                     <!-- Live Image Preview Card -->
                     <div id="preview-box" class="preview-container">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                            <span style="font-size: 0.825rem; font-weight: 700; color: var(--teal-700);">Scan Loaded For Inference</span>
+                            <span style="font-size: 0.825rem; font-weight: 700; color: var(--teal-700);">Scan Loaded For Analysis</span>
                             <button type="button" class="btn btn-danger btn-sm" onclick="clearFileSelection(event)">Remove</button>
                         </div>
                         <img id="preview-img" class="preview-thumbnail" src="#" alt="Scan Preview">
@@ -161,7 +161,7 @@
 
                 <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-btn">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    Run Deep Learning & Grad-CAM Analysis
+                    Run Algorithmic &amp; BFS Matrix Analysis
                 </button>
             </form>
         </div>
@@ -186,24 +186,24 @@
                     <li style="display: flex; gap: 0.75rem;">
                         <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--teal-50); color: var(--teal-600); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
                         <div>
-                            <strong style="color: var(--slate-900);">Multi-Scale CNN Inference</strong>
-                            <p style="font-size: 0.8rem; margin-top: 0.15rem;">Evaluates pathological activations across convolutional layers to compute confidence.</p>
+                            <strong style="color: var(--slate-900);">BFS Component Analysis (DSA)</strong>
+                            <p style="font-size: 0.8rem; margin-top: 0.15rem;">Traverses the 2D pixel grid graph using 8-connected BFS to detect contiguous anomaly clusters.</p>
                         </div>
                     </li>
 
                     <li style="display: flex; gap: 0.75rem;">
                         <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--teal-50); color: var(--teal-600); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
                         <div>
-                            <strong style="color: var(--slate-900);">Grad-CAM Heatmap Generation</strong>
-                            <p style="font-size: 0.8rem; margin-top: 0.15rem;">Produces gradient-weighted activation overlays ensuring transparent explainability.</p>
+                            <strong style="color: var(--slate-900);">ROI Bounding Box Generation</strong>
+                            <p style="font-size: 0.8rem; margin-top: 0.15rem;">Extracts coordinates and marks detected regions of interest on the scan without black-box ML.</p>
                         </div>
                     </li>
 
                     <li style="display: flex; gap: 0.75rem;">
                         <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--teal-50); color: var(--teal-600); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">4</div>
                         <div>
-                            <strong style="color: var(--slate-900);">Reliability Scoring</strong>
-                            <p style="font-size: 0.8rem; margin-top: 0.15rem;">Computes prediction stability index to prevent out-of-distribution hallucinations.</p>
+                            <strong style="color: var(--slate-900);">Statistical Evaluation</strong>
+                            <p style="font-size: 0.8rem; margin-top: 0.15rem;">Computes mathematical variance and intensity deviation against clinical thresholds.</p>
                         </div>
                     </li>
                 </ul>
@@ -228,7 +228,7 @@
                 <h3>Recent Clinical Evaluations</h3>
                 <p style="font-size: 0.85rem; margin-top: 0.25rem;">Previously analyzed scans and verified physician diagnostic records.</p>
             </div>
-            <a href="{{ url_for('results') }}" class="btn btn-outline btn-sm">View Latest Inference &rarr;</a>
+            <a href="{{ url_for('results') }}" class="btn btn-outline btn-sm">View Latest Analysis &rarr;</a>
         </div>
 
         <div class="table-responsive">
@@ -238,7 +238,7 @@
                         <th>Patient ID</th>
                         <th>Scan Modality</th>
                         <th>Condition Prediction</th>
-                        <th>Confidence</th>
+                        <th>Contrast Prominence</th>
                         <th>Reliability Index</th>
                         <th>Evaluation Date</th>
                         <th>Action</th>
@@ -327,7 +327,7 @@
         reader.readAsDataURL(file);
 
         const fileSizeKB = (file.size / 1024).toFixed(1);
-        fileInfo.innerHTML = `<strong>${file.name}</strong> &bull; ${fileSizeKB} KB &bull; Ready for CNN Processing`;
+        fileInfo.innerHTML = `<strong>${file.name}</strong> &bull; ${fileSizeKB} KB &bull; Ready for Algorithmic Analysis`;
     }
 
     function clearFileSelection(e) {

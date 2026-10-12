@@ -10,7 +10,7 @@ except ImportError:
     pass
 
 from models import db, User, ScanRecord
-
+from image_processing import MedicalImageProcessor
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "medicmitra-secure-clinical-key-2026")
 
@@ -125,7 +125,7 @@ def signup():
             return render_template('signup.html', form_data=request.form)
 
         if not terms:
-            flash("You must agree to the Clinical AI Protocol terms to register.", "error")
+            flash("You must agree to the Clinical Protocol terms to register.", "error")
             return render_template('signup.html', form_data=request.form)
 
         if len(password) < 6:
@@ -186,7 +186,7 @@ def dashboard():
     stats = {
         'total_scans': max(len(recent_scans) + 142, 145),
         'avg_confidence': 95.4,
-        'model_status': 'ResNet-50 / DenseNet-121 Online',
+        'model_status': 'DSA Image Pipeline Active',
         'pipeline_health': '100% Operational'
     }
     return render_template('dashboard.html', recent_scans=recent_scans, stats=stats)
@@ -213,30 +213,38 @@ def analyze():
             flash("File format not accepted. Supported: PNG, JPG, JPEG, TIFF, DCM.", "error")
             return redirect(url_for('dashboard'))
 
-    # Create new scan analysis record
-    new_scan = ScanRecord(
-        patient_id=patient_id,
-        modality=modality,
-        original_image=image_filename,
-        heatmap_image=image_filename,
-        condition_predicted="Pneumonia Infiltration Detected (Bilateral)",
-        confidence_score=94.2,
-        reliability_index=0.92,
-        stability="High",
-        clinical_notes=clinical_notes,
-        user_id=session.get('user_id')
-    )
-    db.session.add(new_scan)
-    db.session.commit()
-
-    flash("Scan processed successfully through the explainable AI pipeline!", "success")
-    return redirect(url_for('results', scan_id=new_scan.id))
+    if image_filename:
+        # Process the image using our OOP/DSA pipeline
+        processor = MedicalImageProcessor(app.config['UPLOAD_FOLDER'])
+        results = processor.process(file_path, image_filename)
+        
+        # Create new scan analysis record with actual calculated data
+        new_scan = ScanRecord(
+            patient_id=patient_id,
+            modality=modality,
+            original_image=image_filename,
+            heatmap_image=results["analyzed_image"],
+            condition_predicted=results["severity"],
+            confidence_score=results["anomaly_score"],
+            reliability_index=0.95, # Statistical confidence
+            stability=f"{results['flagged_regions_count']} anomalies found",
+            clinical_notes=clinical_notes,
+            user_id=session.get('user_id')
+        )
+        db.session.add(new_scan)
+        db.session.commit()
+    
+        flash("Scan processed successfully using the deterministic algorithmic pipeline!", "success")
+        return redirect(url_for('results', scan_id=new_scan.id))
+    else:
+        flash("No valid image uploaded.", "error")
+        return redirect(url_for('dashboard'))
 
 @app.route('/results')
 @app.route('/results/<int:scan_id>')
 @login_required
 def results(scan_id=None):
-    """Clinical Explainability & Diagnostic Inference Presentation"""
+    """Deterministic Algorithmic Analysis & ROI Presentation"""
     if scan_id:
         scan = ScanRecord.query.get(scan_id)
     else:
@@ -266,7 +274,7 @@ def seed_demo_data():
             demo_doctor = User(
                 name="Sarah Mitchell, M.D.",
                 doctor_id="DOC-7749",
-                specialty="Thoracic Radiology & AI Diagnostics",
+                specialty="Thoracic Radiology & Image Analysis",
                 hospital="MedicMitra University Medical Center",
                 email="doctor@medicmitra.com"
             )

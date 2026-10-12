@@ -1,4 +1,7 @@
 Flask==3.0.0
 Flask-SQLAlchemy==3.1.1
-psycopg2-binary==2.9.9
+
 python-dotenv==1.0.0
+opencv-python==4.10.0.84
+numpy==2.2.0
+matplotlib==3.10.0
