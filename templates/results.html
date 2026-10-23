@@ -772,7 +772,7 @@
                             {% if scan.clinical_notes and scan.clinical_notes.strip() %}
                                 <strong>{{ scan.clinical_notes.strip() }}</strong>
                             {% else %}
-                                <em>Evaluation of acute lower respiratory symptoms; patient presenting for radiographic assessment. Rule out focal airspace opacity / consolidation.</em>
+                                <em>Clinical evaluation; patient presenting for thoracic radiographic assessment and radiodensity screening.</em>
                             {% endif %}
                         </td>
                     </tr>
@@ -881,9 +881,9 @@
                         <td class="checklist-col-cat">Lungs &amp; Airway</td>
                         <td class="checklist-col-desc">
                             {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
-                                Focal high-attenuation airspace opacity identified in the lower hemithorax. Trachea is midline. No evidence of diffuse bilateral alveolar flooding or pneumothorax line.
+                                Focal region of increased radiodensity / airspace opacity identified in the lower hemithorax. Trachea is midline. No evidence of pneumothorax or diffuse bilateral alveolar flooding.
                             {% else %}
-                                Clear lung parenchyma bilaterally. No focal airspace consolidation, mass, or pneumothorax identified. Trachea midline.
+                                Clear lung parenchyma bilaterally. Physiologic aeration throughout both lung fields. No focal airspace consolidation, mass, or pneumothorax identified. Trachea midline.
                             {% endif %}
                         </td>
                     </tr>
@@ -893,7 +893,7 @@
                     </tr>
                     <tr>
                         <td class="checklist-col-cat">Cardiomediastinal</td>
-                        <td class="checklist-col-desc">Transverse cardiac diameter is within normal limits. Mediastinal and hilar contours are grossly preserved without gross hilar lymphadenopathy.</td>
+                        <td class="checklist-col-desc">Transverse cardiac diameter is within normal limits. Mediastinal and hilar contours are grossly preserved without enlargement.</td>
                     </tr>
                     <tr>
                         <td class="checklist-col-cat">Osseous &amp; Soft Tissues</td>
@@ -901,7 +901,7 @@
                     </tr>
                 </table>
 
-                <!-- SECTION 4: IMPRESSION & DIFFERENTIAL DIAGNOSIS -->
+                <!-- SECTION 4: IMPRESSION & DIFFERENTIAL CONSIDERATIONS -->
                 <div class="report-sec-heading">
                     <span>4. Clinical Impression &amp; Differential Considerations</span>
                 </div>
@@ -910,25 +910,25 @@
                     <div class="impression-item">
                         <strong>1. Primary Radiographic Finding:</strong>
                         {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
-                            Focal airspace opacity / consolidation in the lower hemithorax. In the clinical context of acute lower respiratory presentation (e.g. cough, fever, dyspnea), findings are suspicious for <strong>Community-Acquired Pneumonia (CAP)</strong>.
+                            Focal region of increased radiopacity / airspace opacity in the lower hemithorax, reflecting localized reduced pulmonary aeration or tissue density variation.
                         {% else %}
-                            No acute cardiopulmonary abnormality detected. Clear lung fields bilaterally.
+                            No acute focal cardiopulmonary abnormality identified. Clear and symmetric pulmonary aeration bilaterally.
                         {% endif %}
                     </div>
                     <div class="impression-item">
-                        <strong>2. Differential Diagnoses to Consider:</strong>
+                        <strong>2. Differential Considerations:</strong>
                         {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
-                            Infectious consolidation (bacterial or atypical pneumonia), focal subsegmental atelectasis (mucus plugging), aspiration pneumonitis, or resolving localized parenchymal inflammation.
+                            Radiographic appearance is non-specific and warrants clinical correlation. Differential considerations include: localized infectious or inflammatory infiltration, focal subsegmental atelectasis (volume loss / mucus plugging), localized fluid accumulation, or resolving post-inflammatory change.
                         {% else %}
-                            Unremarkable thoracic radiograph. Correlate with clinical history.
+                            Unremarkable baseline thoracic radiograph within normal limits for projection and technique.
                         {% endif %}
                     </div>
                     <div class="impression-item" style="margin-bottom: 0;">
-                        <strong>3. Recommended Follow-Up:</strong>
+                        <strong>3. Recommended Clinical Correlation:</strong>
                         {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
-                            Correlate clinically with bedside auscultation, vital signs, and inflammatory biomarkers (CBC, CRP). If treated for acute lower respiratory infection, follow-up CXR in 6&ndash;8 weeks is recommended to confirm complete radiographic resolution and exclude underlying endobronchial pathology.
+                            Direct correlation with the primary clinical indication, patient history, and physical examination findings. Determine appropriate clinical management, laboratory workup, or interval follow-up imaging based on the overall clinical presentation.
                         {% else %}
-                            Clinical follow-up as indicated if respiratory symptoms persist.
+                            Routine clinical management and follow-up as indicated by the referring provider.
                         {% endif %}
                     </div>
                 </div>
@@ -1017,28 +1017,30 @@
                         </p>
                         <p style="margin: 0;">
                             {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
-                                Your scan revealed a <strong>cloudy or dense white patch</strong> (called an <em>opacity</em> or <em>consolidation</em>) in your lower lung. This occurs when normal air in the microscopic lung sacs is temporarily replaced by fluid, mucus, or inflammatory cells.
+                                Your scan revealed an area of <strong>increased density or cloudiness</strong> (often called an <em>opacity</em>) in the lung field. In simple terms, this means that in that specific spot, there is more fluid, tissue, or cellular density than normal empty air.
                             {% else %}
-                                Your scan showed <strong>clear, dark lungs</strong> without any unexpected shadows, dense fluid buildup, or abnormal white spots.
+                                Your scan showed <strong>clear, aerated lungs</strong> without any unexpected shadows, dense fluid buildup, or abnormal white spots.
                             {% endif %}
                         </p>
                     </div>
 
-                    <!-- Column 2: Does this mean Pneumonia? -->
+                    <!-- Column 2: What Causes Shadows or Density Changes? -->
                     <div class="patient-guide-card">
                         <h4>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--theme-accent)" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                            2. Does This Mean I Have Pneumonia?
+                            2. What Can Cause These Shadows?
                         </h4>
-                        <p style="margin: 0 0 0.5rem 0;">
-                            <strong>Not by itself.</strong> An X-ray shows the physical shadow inside the lung, but a picture alone cannot tell which specific bacteria, virus, or condition caused it.
+                        <p style="margin: 0 0 0.35rem 0;">
+                            An X-ray shows the physical shadow, but many different conditions can create similar-looking shadows. Common causes include:
                         </p>
-                        <p style="margin: 0;">
-                            {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
-                                When a cloudy patch appears alongside symptoms like fever, coughing, or shortness of breath, a lung infection such as <strong>pneumonia</strong> is the most common cause. Your doctor will listen to your chest, check your oxygen, and may order blood tests to confirm pneumonia and choose the right medication.
-                            {% else %}
-                                The absence of a white shadow strongly suggests you do not have acute consolidation or typical pneumonia. Your doctor will evaluate other causes if you still have cough or discomfort.
-                            {% endif %}
+                        <ul style="margin: 0 0 0.35rem 0; padding-left: 1.1rem; line-height: 1.4; font-size: 0.75rem;">
+                            <li><strong>Fluid or Mucus:</strong> Temporary buildup from inflammation or a chest infection.</li>
+                            <li><strong>Incomplete Expansion (Atelectasis):</strong> A small patch not expanding fully from shallow breathing or lying down.</li>
+                            <li><strong>Fluid Balance Changes:</strong> Temporary fluid retention related to circulation.</li>
+                            <li><strong>Harmless Scars:</strong> Old marks left behind by past illnesses or minor injuries.</li>
+                        </ul>
+                        <p style="margin: 0; font-size: 0.725rem; color: var(--text-secondary);">
+                            Your doctor combines this shadow with your specific symptoms and physical exam to determine the exact cause.
                         </p>
                     </div>
                 </div>
@@ -1051,10 +1053,10 @@
 
                 <div class="patient-guide-card" style="margin-bottom: 0.85rem;">
                     <ul class="doctor-questions-list">
-                        <li><strong>"Does this shadow confirm pneumonia, bronchitis, or another lung condition?"</strong> Helps clarify your doctor's working diagnosis.</li>
-                        <li><strong>"Do I need prescription antibiotics, an inhaler, or rest and fever relievers?"</strong> Understand which treatment is appropriate for bacterial vs. viral infections.</li>
-                        <li><strong>"How many days should it take before my breathing and energy begin to improve?"</strong> Gives you a realistic timeline for recovery.</li>
-                        <li><strong>"Do I need a follow-up chest X-ray in 6 to 8 weeks?"</strong> Doctors often recommend a repeat scan after recovery to confirm the cloudiness has fully disappeared.</li>
+                        <li><strong>"What do you think is the most likely cause of the shadow or finding seen on this X-ray?"</strong> Helps you understand your doctor's working evaluation.</li>
+                        <li><strong>"How do my physical symptoms, breathing, and medical history fit with this image?"</strong> Connects your personal feeling to what the picture shows.</li>
+                        <li><strong>"What is the recommended next step &mdash; do I need treatment, rest, medication, or observation?"</strong> Clarifies your immediate care plan.</li>
+                        <li><strong>"Will I need a follow-up X-ray or additional checkup in the future?"</strong> Helps you know if and when repeat imaging is needed to track progress.</li>
                     </ul>
                 </div>
 
