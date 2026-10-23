@@ -55,7 +55,7 @@
                 <div class="form-group">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
                         <label class="form-label" for="password" style="margin-bottom: 0;">Password</label>
-                        <a href="#" style="font-size: 0.8rem; color: var(--teal-600); font-weight: 600;" onclick="alert('For demo accounts, use password: medic123')">Forgot Password?</a>
+                        <a href="javascript:void(0)" style="font-size: 0.8rem; color: var(--teal-600); font-weight: 600;" onclick="if(window.toast) window.toast.info('Demo Password Hint', 'For demo access, use: medic123');">Forgot Password?</a>
                     </div>
                     <input 
                         type="password" 
@@ -100,6 +100,9 @@
         document.getElementById('identifier').value = 'doctor@medicmitra.com';
         document.getElementById('password').value = 'medic123';
         document.getElementById('password').focus();
+        if (window.toast) {
+            window.toast.success('Credentials Loaded', 'Dr. Sarah Mitchell (DOC-7749)');
+        }
     }
 </script>
 {% endblock %}

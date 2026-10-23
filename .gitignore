@@ -11,6 +11,10 @@ __pycache__/
 .env.local
 .env.*.local
 
+# Node & Package Managers
+node_modules/
+npm-debug.log*
+
 # Database & Instances (Supabase / SQLite)
 instance/
 *.db

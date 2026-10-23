@@ -378,6 +378,9 @@
 
         const fileSizeKB = (file.size / 1024).toFixed(1);
         fileInfo.innerHTML = `<strong>${file.name}</strong> &bull; ${fileSizeKB} KB &bull; Verified Format`;
+        if (window.toast) {
+            window.toast.success('Radiograph Loaded', file.name + ' (' + fileSizeKB + ' KB)');
+        }
     }
 
     function clearFileSelection(e) {

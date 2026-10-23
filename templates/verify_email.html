@@ -76,7 +76,7 @@
 
             <div style="text-align: center; border-top: 1px solid var(--slate-100); padding-top: 1.25rem; margin-top: 1.5rem; font-size: 0.85rem; color: var(--slate-500);">
                 Didn't receive the email? 
-                <a href="javascript:void(0)" onclick="alert('Verification code resent to {{ user.email }}');" style="color: var(--teal-600); font-weight: 600; text-decoration: underline;">
+                <a href="javascript:void(0)" onclick="if(window.toast) window.toast.info('Passkey Resent', 'Verification code dispatched to {{ user.email }}');" style="color: var(--teal-600); font-weight: 600; text-decoration: underline;">
                     Resend Code
                 </a>
             </div>
@@ -91,6 +91,7 @@
         const input = document.getElementById('pin');
         input.value = pin;
         input.focus();
+        if (window.toast) window.toast.success('Passkey Applied', 'PIN ' + pin + ' populated');
     }
 </script>
 {% endblock %}
