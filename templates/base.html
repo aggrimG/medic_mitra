@@ -5,10 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}MedicMitra | Medical Image Analysis System{% endblock %}</title>
-    <!-- Preconnect Fonts -->
+    <!-- Preconnect Fonts (Libre Baskerville for Headings, Urbanist for Body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Urbanist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Immediate theme setter to prevent FOUC -->
+    <script>
+        (function() {
+            try {
+                const stored = localStorage.getItem('medicmitra_theme');
+                if (stored === 'dark' || stored === 'light') {
+                    document.documentElement.setAttribute('data-theme', stored);
+                } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            } catch(e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            try {
+                localStorage.setItem('medicmitra_theme', next);
+            } catch(e) {}
+            updateThemeToggleIcons(next);
+        }
+
+        function updateThemeToggleIcons(theme) {
+            document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+                if (theme === 'dark') {
+                    btn.setAttribute('title', 'Switch to Light Mode (Warm Clinical)');
+                    btn.setAttribute('aria-label', 'Switch to Light Mode (Warm Clinical)');
+                } else {
+                    btn.setAttribute('title', 'Switch to Dark Mode (Monitor Glow)');
+                    btn.setAttribute('aria-label', 'Switch to Dark Mode (Monitor Glow)');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            updateThemeToggleIcons(current);
+        });
+    </script>
     <!-- Main Clinical Design System -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block extra_css %}{% endblock %}

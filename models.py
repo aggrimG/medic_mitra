@@ -14,6 +14,8 @@ class User(db.Model):
     specialty = db.Column(db.String(100), default='General Radiology')
     hospital = db.Column(db.String(150), default='MedicMitra Health Center')
     password_hash = db.Column(db.String(256), nullable=False)
+    is_verified = db.Column(db.Boolean, default=False)
+    verification_pin = db.Column(db.String(6), default='123456')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationship to scans
@@ -38,8 +40,8 @@ class ScanRecord(db.Model):
     heatmap_image = db.Column(db.String(256), nullable=True)
     condition_predicted = db.Column(db.String(120), default='Normal / No Infiltration')
     confidence_score = db.Column(db.Float, default=94.2)
-    reliability_index = db.Column(db.Float, default=0.91)
-    stability = db.Column(db.String(32), default='High')
+    reliability_index = db.Column(db.Float, default=0.95)
+    stability = db.Column(db.String(64), default='Stable Finding')
     clinical_notes = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

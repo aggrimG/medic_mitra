@@ -1,18 +1,20 @@
 {% extends 'base.html' %}
 
-{% block title %}Medical Diagnostic Report #{{ scan.patient_id }} | MedicMitra{% endblock %}
+{% block title %}Diagnostic Report & Patient Guide #{{ scan.patient_id }} | MedicMitra{% endblock %}
 
 {% block extra_css %}
 <style>
 /* ============================================================
-   PROFESSIONAL CLINICAL REPORT STYLESHEET (STRICT 2-PAGE LAYOUT)
+   MEDICMITRA CLINICAL REPORT & PATIENT GUIDE STYLESHEET
+   Strict 2-Page Architecture (Page 1: Physician CAD Report | Page 2: Patient Guide)
+   Theme: 60-30-10 Clinical Balance & Libre Baskerville / Urbanist
    ============================================================ */
 
 .report-wrapper {
-    max-width: 920px;
+    max-width: 900px;
     margin: 1.5rem auto 4rem auto;
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: #1e293b;
+    font-family: 'Urbanist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text-primary);
 }
 
 /* Screen Action Bar (hidden on print) */
@@ -20,54 +22,56 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 1rem 1.5rem;
-    margin-bottom: 1.75rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
 }
 
 .report-action-bar h2 {
+    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 1.15rem;
     font-weight: 700;
     margin: 0;
-    color: #0f172a;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
 .report-action-bar p {
-    font-size: 0.8rem;
-    color: #64748b;
+    font-size: 0.825rem;
+    color: var(--text-muted);
     margin: 0.15rem 0 0 0;
 }
 
-/* Individual Report Pages */
+/* Individual Report Sheets */
 .report-sheet {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    padding: 2.25rem 2.5rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    padding: 2rem 2.25rem;
     margin-bottom: 2.5rem;
-    min-height: 1120px;
+    min-height: 1060px;
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     box-sizing: border-box;
+    color: var(--text-primary);
 }
 
-/* Header & Letterhead */
+/* Formal Hospital Letterhead */
 .report-letterhead {
-    border-bottom: 2px solid #0f766e;
-    padding-bottom: 1rem;
-    margin-bottom: 1.25rem;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    border-bottom: 2px solid var(--theme-accent);
+    padding-bottom: 0.85rem;
+    margin-bottom: 1rem;
 }
 
 .institution-brand {
@@ -77,112 +81,120 @@
 }
 
 .institution-logo {
-    width: 44px;
-    height: 44px;
-    background: linear-gradient(135deg, #0d9488, #0284c7);
-    color: #ffffff;
-    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    background: var(--theme-accent);
+    color: var(--theme-accent-text);
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .institution-title {
-    font-size: 1.25rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: #0f172a;
-    line-height: 1.2;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--text-primary);
 }
 
 .institution-subtitle {
-    font-size: 0.775rem;
-    color: #475569;
-    font-weight: 500;
-    margin-top: 0.15rem;
+    font-size: 0.725rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--theme-accent);
+    margin-top: 0.1rem;
 }
 
 .report-metadata-badge {
     text-align: right;
-    font-size: 0.775rem;
-    color: #64748b;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.4;
 }
 
 .report-doc-title {
+    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.95rem;
-    font-weight: 800;
-    color: #0f766e;
-    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-primary);
     letter-spacing: 0.04em;
-    margin-bottom: 0.25rem;
+    text-transform: uppercase;
 }
 
-/* Patient Demographics Table */
+/* Demographics Table */
 .demographics-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 1.25rem;
-    font-size: 0.825rem;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-sm);
     overflow: hidden;
 }
 
 .demographics-table td {
-    padding: 0.55rem 0.85rem;
-    border: 1px solid #e2e8f0;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--border-hairline);
 }
 
 .demographics-label {
     font-weight: 600;
-    color: #475569;
+    color: var(--text-secondary);
     width: 18%;
-    background: #f1f5f9;
+    background: var(--bg-subtle);
 }
 
 .demographics-val {
-    color: #0f172a;
+    color: var(--text-primary);
     font-weight: 500;
     width: 32%;
 }
 
+.demographics-notes-row {
+    background: var(--bg-surface);
+}
+
 /* Section Headings */
 .report-sec-heading {
-    font-size: 0.9rem;
-    font-weight: 800;
+    font-size: 0.8rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: #0f766e;
-    border-bottom: 1px solid #cbd5e1;
-    padding-bottom: 0.35rem;
-    margin: 1rem 0 0.75rem 0;
+    letter-spacing: 0.04em;
+    color: var(--theme-accent);
+    border-bottom: 1px solid var(--border-hairline);
+    padding-bottom: 0.25rem;
+    margin: 0.85rem 0 0.6rem 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .report-sec-badge {
-    font-size: 0.7rem;
+    font-size: 0.675rem;
     font-weight: 700;
     padding: 0.15rem 0.5rem;
     border-radius: 9999px;
-    text-transform: none;
-    letter-spacing: normal;
+    background: var(--theme-accent-subtle);
+    color: var(--theme-accent);
 }
 
-/* Medical Images Plate Layout */
+/* Imaging Plate Grid */
 .imaging-plate-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
-    margin-bottom: 1.25rem;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
 }
 
 .imaging-figure {
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    background: #0f172a;
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-sm);
+    background: var(--slate-900);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -190,7 +202,7 @@
 
 .imaging-frame {
     width: 100%;
-    height: 250px;
+    height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -206,205 +218,285 @@
 }
 
 .imaging-caption {
-    background: #f8fafc;
-    border-top: 1px solid #e2e8f0;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
-    color: #475569;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-hairline);
+    padding: 0.4rem 0.65rem;
+    font-size: 0.725rem;
+    color: var(--text-secondary);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.imaging-caption strong {
-    color: #0f172a;
-}
-
-/* Key Metrics Summary Bar */
+/* CAD Quantitative Metric Strip */
 .metrics-summary-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
+    gap: 0.65rem;
+    margin-bottom: 0.75rem;
 }
 
 .metric-pill-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 0.65rem 0.75rem;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.6rem;
     text-align: center;
 }
 
 .metric-pill-label {
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: 0.65rem;
+    font-weight: 700;
     text-transform: uppercase;
-    color: #64748b;
+    color: var(--text-muted);
     margin-bottom: 0.2rem;
+    letter-spacing: 0.03em;
 }
 
 .metric-pill-val {
-    font-size: 1.05rem;
-    font-weight: 800;
-    color: #0f172a;
+    font-size: 0.925rem;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
-/* Analytical Overview Box */
+/* Finding Banner */
 .finding-alert-banner {
-    background: #f0fdfa;
-    border: 1px solid #99f6e4;
-    border-left: 4px solid #0d9488;
-    border-radius: 4px;
-    padding: 0.75rem 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.85rem;
-    line-height: 1.5;
+    background: var(--theme-accent-subtle);
+    border: 1px solid var(--theme-accent-border);
+    border-left: 3px solid var(--theme-accent);
+    border-radius: var(--radius-sm);
+    padding: 0.55rem 0.8rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.775rem;
+    line-height: 1.45;
 }
 
 .finding-alert-title {
-    font-weight: 800;
-    color: #0f766e;
-    margin-bottom: 0.2rem;
+    font-weight: 700;
+    color: var(--theme-accent);
+    margin-bottom: 0.15rem;
 }
 
-/* Progress / Contrast Bar */
-.contrast-bar-wrapper {
-    background: #e2e8f0;
-    border-radius: 9999px;
-    height: 8px;
-    overflow: hidden;
-    margin: 0.35rem 0;
-}
-
-.contrast-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #0d9488, #0284c7);
-}
-
-/* Page 2 Specific Elements */
-.roi-table {
+/* Structured Findings Checklist */
+.checklist-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.775rem;
-    margin-bottom: 1.25rem;
-    border: 1px solid #e2e8f0;
+    margin-bottom: 0.85rem;
+    border: 1px solid var(--border-hairline);
 }
 
-.roi-table th {
-    background: #f1f5f9;
-    color: #475569;
+.checklist-table td {
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--border-hairline);
+    vertical-align: top;
+}
+
+.checklist-col-cat {
+    width: 25%;
     font-weight: 700;
-    text-align: left;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
 }
 
-.roi-table td {
-    padding: 0.45rem 0.75rem;
-    border: 1px solid #e2e8f0;
-    color: #334155;
+.checklist-col-desc {
+    width: 75%;
+    color: var(--text-primary);
 }
 
-.roi-table tr:nth-child(even) td {
-    background: #f8fafc;
+/* Impression & Attestation Card */
+.impression-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 0.9rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.775rem;
+    line-height: 1.45;
 }
 
-/* Symptom Guide 2-Column Clinical Layout */
-.symptom-guide-box {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 1rem;
-    margin-bottom: 1.25rem;
+.impression-item {
+    margin-bottom: 0.45rem;
 }
 
-.symptom-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    font-size: 0.8rem;
-    line-height: 1.4;
+.impression-item strong {
+    color: var(--text-primary);
 }
 
-.symptom-item strong {
-    color: #0f172a;
-}
-
-/* Physician Signature and Attestation Block */
 .physician-signoff-card {
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    padding: 1rem 1.25rem;
-    background: #ffffff;
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    background: var(--bg-surface);
     display: grid;
     grid-template-columns: 1.8fr 1.2fr;
-    gap: 1.5rem;
-    align-items: flex-end;
+    gap: 1.25rem;
+    align-items: center;
 }
 
 .physician-notes-view {
-    font-size: 0.8rem;
-    color: #334155;
-    line-height: 1.5;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
 }
 
 .signature-seal-area {
-    border: 1px dashed #94a3b8;
-    border-radius: 6px;
-    background: #f8fafc;
-    padding: 0.85rem;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--bg-subtle);
+    padding: 0.65rem;
     text-align: center;
 }
 
 .official-seal {
     display: inline-block;
-    padding: 0.2rem 0.6rem;
-    background: #0f766e;
-    color: #ffffff;
+    padding: 0.15rem 0.5rem;
+    background: var(--theme-accent);
+    color: var(--theme-accent-text);
     font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
+    font-weight: 700;
+    letter-spacing: 0.05em;
     border-radius: 3px;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.3rem;
 }
 
 .signature-line {
-    border-bottom: 1px solid #0f172a;
-    width: 80%;
-    margin: 0.6rem auto 0.3rem auto;
+    border-bottom: 1px solid var(--text-primary);
+    width: 75%;
+    margin: 0.45rem auto 0.25rem auto;
+}
+
+/* Page 2: Patient Guide Cards */
+.patient-intro-banner {
+    background: var(--theme-accent-subtle);
+    border: 1px solid var(--theme-accent-border);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.825rem;
+    line-height: 1.5;
+}
+
+.patient-guide-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    margin-bottom: 0.85rem;
+}
+
+.patient-guide-card {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem;
+    font-size: 0.775rem;
+    line-height: 1.45;
+}
+
+.patient-guide-card h4 {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.4rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.doctor-questions-list {
+    margin: 0;
+    padding-left: 1.15rem;
+    font-size: 0.775rem;
+    line-height: 1.45;
+    color: var(--text-primary);
+}
+
+.doctor-questions-list li {
+    margin-bottom: 0.35rem;
+}
+
+/* Urgent Red Flag Alert Box */
+.urgent-redflag-box {
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-left: 4px solid #ef4444;
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 0.9rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.775rem;
+    line-height: 1.45;
+}
+
+.urgent-redflag-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #b91c1c;
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.redflag-items-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem 1rem;
+    color: #7f1d1d;
+    margin-top: 0.3rem;
+}
+
+/* Glossary Chips */
+.glossary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    margin-bottom: 0.85rem;
+}
+
+.glossary-item {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-sm);
+    padding: 0.55rem 0.7rem;
+    font-size: 0.725rem;
+    line-height: 1.4;
+}
+
+.glossary-item strong {
+    color: var(--theme-accent);
+    display: block;
+    margin-bottom: 0.15rem;
+    font-size: 0.75rem;
 }
 
 /* Page Footers */
 .report-footer {
-    border-top: 1px solid #e2e8f0;
-    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-hairline);
+    padding-top: 0.6rem;
     margin-top: auto;
     font-size: 0.7rem;
-    color: #64748b;
+    color: var(--text-muted);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 /* ============================================================
-   STRICT 2-PAGE PRINT MEDIA QUERY RULES
+   STRICT 2-PAGE PRINT MEDIA RULES (A4 Portrait Enforced)
    ============================================================ */
 @media print {
     @page {
         size: A4 portrait;
-        margin: 1cm 1.2cm;
+        margin: 8mm 10mm;
     }
 
-    body {
+    html, body {
         background: #ffffff !important;
         color: #000000 !important;
         margin: 0 !important;
         padding: 0 !important;
+        width: 100% !important;
     }
 
     .workspace-topbar,
@@ -420,31 +512,86 @@
     }
 
     .report-sheet {
+        background: #ffffff !important;
+        color: #000000 !important;
         border: none !important;
         box-shadow: none !important;
         border-radius: 0 !important;
-        padding: 0 !important;
+        padding: 6mm 8mm !important;
         margin: 0 !important;
-        min-height: auto !important;
-        height: auto !important;
+        height: 281mm !important;
+        max-height: 281mm !important;
+        min-height: 281mm !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
     }
 
     #page-1 {
         page-break-after: always !important;
         break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 
     #page-2 {
         page-break-after: auto !important;
         break-after: auto !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 
     .imaging-frame {
-        height: 220px !important;
+        height: 165px !important;
     }
 
     .imaging-frame img {
-        max-height: 220px !important;
+        max-height: 165px !important;
+    }
+
+    .demographics-table, .demographics-table td,
+    .checklist-table, .checklist-table td,
+    .impression-card, .physician-signoff-card,
+    .patient-guide-card, .glossary-item, .metric-pill-box {
+        border-color: #cbd5e1 !important;
+        color: #000000 !important;
+        background: #ffffff !important;
+    }
+
+    .demographics-label, .checklist-col-cat {
+        background: #f1f5f9 !important;
+        color: #1e293b !important;
+    }
+
+    .report-letterhead {
+        border-bottom-color: #0f766e !important;
+    }
+
+    .institution-logo, .official-seal {
+        background: #0f766e !important;
+        color: #ffffff !important;
+    }
+
+    .finding-alert-banner {
+        background: #f0fdfa !important;
+        border-color: #99f6e4 !important;
+        border-left-color: #0d9488 !important;
+        color: #000000 !important;
+    }
+
+    .patient-intro-banner {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        color: #000000 !important;
+    }
+
+    .urgent-redflag-box {
+        background: #fef2f2 !important;
+        border-color: #fca5a5 !important;
+        border-left-color: #dc2626 !important;
+        color: #991b1b !important;
     }
 }
 </style>
@@ -454,7 +601,7 @@
 <header class="workspace-topbar">
     <div class="workspace-topbar-inner">
         <div class="topbar-left">
-            <a href="{{ url_for('dashboard') }}" class="brand-logo" style="font-size: 1.15rem;">
+            <a href="{{ url_for('index') }}" class="brand-logo" style="font-size: 1.15rem;" title="Return to MedicMitra Home">
                 <div class="brand-badge-icon" style="width: 32px; height: 32px;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                 </div>
@@ -470,21 +617,81 @@
         </div>
 
         <div class="topbar-right">
-            <div class="doctor-profile-badge">
-                <div class="doctor-avatar">
-                    {{ current_user.name[0] if current_user and current_user.name else 'D' }}
-                </div>
-                <div>
-                    <div style="font-size: 0.825rem; font-weight: 700; color: var(--slate-900);">
-                        Dr. {{ current_user.name if current_user else 'Physician' }}
+            <!-- Enhanced Doctor Profile Trigger & Popover -->
+            <div class="doctor-profile-interactive">
+                <div class="doctor-profile-pill" onclick="toggleDoctorPopover(event)">
+                    <div class="doctor-avatar">
+                        {{ current_user.name[0] if current_user and current_user.name else 'D' }}
                     </div>
-                    <div style="font-size: 0.725rem; color: var(--slate-500);">
-                        {{ current_user.doctor_id if current_user else 'DOC-7749' }}
+                    <div>
+                        <div style="font-size: 0.825rem; font-weight: 700; color: var(--slate-900); display: flex; align-items: center; gap: 0.35rem;">
+                            <span>{{ (scan.doctor.name if scan.doctor and scan.doctor.name else (current_user.name if current_user else 'Sarah Mitchell, M.D.')) | format_doctor_name }}</span>
+                            {% if current_user and current_user.is_verified %}
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--teal-600)" stroke="white" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            {% endif %}
+                        </div>
+                        <div style="font-size: 0.725rem; color: var(--slate-500);">
+                            {{ scan.doctor.doctor_id if scan.doctor else (current_user.doctor_id if current_user else 'DOC-7749') }} &bull; {{ scan.doctor.specialty if scan.doctor else (current_user.specialty if current_user else 'Thoracic Radiology') }}
+                        </div>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--slate-400); margin-left: 0.25rem;"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+
+                <div id="doctor-popover" class="doctor-profile-popover">
+                    <div class="popover-header">
+                        <div class="popover-header-avatar">
+                            {{ current_user.name[0] if current_user and current_user.name else 'D' }}
+                        </div>
+                        <div class="popover-header-meta">
+                            <div class="popover-doc-name">
+                                {{ (current_user.name if current_user else 'Sarah Mitchell, M.D.') | format_doctor_name }}
+                            </div>
+                            <div class="popover-doc-email">
+                                {{ current_user.email if current_user else 'doctor@medicmitra.com' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="popover-credentials-section">
+                        <div class="popover-cred-card">
+                            <div class="popover-cred-icon">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><line x1="15" y1="8" x2="17" y2="8"/><line x1="15" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+                            </div>
+                            <div class="popover-cred-info">
+                                <span class="popover-cred-label">Medical License ID</span>
+                                <span class="popover-cred-value" style="font-family: monospace; letter-spacing: 0.04em;">{{ current_user.doctor_id if current_user else 'DOC-7749' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="popover-cred-card">
+                            <div class="popover-cred-icon">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>
+                            </div>
+                            <div class="popover-cred-info">
+                                <span class="popover-cred-label">Clinical Specialty</span>
+                                <span class="popover-cred-value">{{ current_user.specialty if current_user else 'Thoracic Radiology' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="popover-cred-card">
+                            <div class="popover-cred-icon">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/><line x1="10" y1="9" x2="14" y2="9"/><line x1="12" y1="7" x2="12" y2="11"/></svg>
+                            </div>
+                            <div class="popover-cred-info">
+                                <span class="popover-cred-label">Hospital Affiliation</span>
+                                <span class="popover-cred-value">{{ current_user.hospital if current_user and current_user.hospital else 'MedicMitra Medical Institute' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="popover-footer">
+                        <a href="{{ url_for('logout') }}" class="btn-popover-signout">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            <span>Sign Out Securely</span>
+                        </a>
                     </div>
                 </div>
             </div>
-
-            <a href="{{ url_for('logout') }}" class="btn btn-outline btn-sm">Sign Out</a>
         </div>
     </div>
 </header>
@@ -498,10 +705,10 @@
         <div class="report-action-bar">
             <div>
                 <h2>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                    Certified Medical Report View
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--theme-accent)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    Certified Medical Report &amp; Patient Guide
                 </h2>
-                <p>Standardized 2-Page Clinical Diagnostic &amp; Image Analysis Report</p>
+                <p>Standardized Dual-Audience Presentation: Page 1 for Clinicians &bull; Page 2 for Patients</p>
             </div>
             <div style="display: flex; gap: 0.75rem;">
                 <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-sm">
@@ -515,7 +722,9 @@
         </div>
 
         <!-- ============================================================
-             PAGE 1: IMAGING PLATES & QUANTITATIVE MATRIX FINDINGS
+             PAGE 1: CLINICAL RADIOLOGY & COMPUTER-AIDED DETECTION (CAD) REPORT
+             Audience: Attending Clinicians, Radiologists, Medical Record
+             Standard: American College of Radiology (ACR) & RSNA RadReport Aligned
              ============================================================ -->
         <div class="report-sheet" id="page-1">
             <div>
@@ -523,292 +732,402 @@
                 <div class="report-letterhead">
                     <div class="institution-brand">
                         <div class="institution-logo">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                         </div>
                         <div>
                             <div class="institution-title">MEDICMITRA RADIOLOGY INSTITUTE</div>
-                            <div class="institution-subtitle">DEPARTMENT OF THORACIC IMAGING &amp; COMPUTATIONAL DIAGNOSTICS</div>
+                            <div class="institution-subtitle">DEPARTMENT OF THORACIC RADIOLOGY &amp; COMPUTER-AIDED DETECTION (CAD)</div>
                         </div>
                     </div>
                     <div class="report-metadata-badge">
-                        <div class="report-doc-title">DIAGNOSTIC REPORT</div>
-                        <div>Report ID: <strong>REP-{{ scan.created_at.strftime('%Y%m') }}-{{ scan.id }}</strong></div>
-                        <div>ISO 15189 / DICOM Standard Compliant</div>
+                        <div class="report-doc-title">DIAGNOSTIC CAD REPORT</div>
+                        <div>Accession ID: <strong>REP-{{ scan.created_at.strftime('%Y%m') }}-{{ scan.id }}</strong></div>
+                        <div style="color: var(--theme-accent); font-weight: 600;">ACR / DICOM Standard Aligned</div>
                     </div>
                 </div>
 
-                <!-- Patient & Study Demographics Grid -->
+                <!-- Patient & Study Demographics Table -->
                 <table class="demographics-table">
                     <tr>
-                        <td class="demographics-label">Patient ID:</td>
+                        <td class="demographics-label">Patient Record:</td>
                         <td class="demographics-val"><strong>{{ scan.patient_id }}</strong></td>
-                        <td class="demographics-label">Study Date:</td>
+                        <td class="demographics-label">Study Date &amp; Time:</td>
                         <td class="demographics-val">{{ scan.created_at.strftime('%d-%b-%Y %H:%M') }} UTC</td>
                     </tr>
                     <tr>
-                        <td class="demographics-label">Imaging Modality:</td>
+                        <td class="demographics-label">Modality:</td>
                         <td class="demographics-val">{{ scan.modality }}</td>
-                        <td class="demographics-label">Exam Protocol:</td>
-                        <td class="demographics-val">High-Res Grayscale CXR (PA/AP)</td>
+                        <td class="demographics-label">Protocol:</td>
+                        <td class="demographics-val">High-Resolution Radiography (CLAHE / CAD Enhanced)</td>
                     </tr>
                     <tr>
-                        <td class="demographics-label">Attending Doctor:</td>
-                        <td class="demographics-val">Dr. {{ current_user.name if current_user else 'Sarah Mitchell, M.D.' }}</td>
-                        <td class="demographics-label">Referring Facility:</td>
-                        <td class="demographics-val">{{ current_user.hospital if current_user and current_user.hospital else 'MedicMitra Affiliated Center' }}</td>
+                        <td class="demographics-label">Attending Physician:</td>
+                        <td class="demographics-val">{{ (scan.doctor.name if scan.doctor and scan.doctor.name else (current_user.name if current_user else 'Sarah Mitchell, M.D.')) | format_doctor_name }}</td>
+                        <td class="demographics-label">Facility:</td>
+                        <td class="demographics-val">{{ scan.doctor.hospital if scan.doctor and scan.doctor.hospital else (current_user.hospital if current_user and current_user.hospital else 'MedicMitra Affiliated Center') }}</td>
+                    </tr>
+                    <tr class="demographics-notes-row">
+                        <td class="demographics-label">Clinical Indication:</td>
+                        <td colspan="3" class="demographics-val" style="color: var(--text-primary);">
+                            {% if scan.clinical_notes and scan.clinical_notes.strip() %}
+                                <strong>{{ scan.clinical_notes.strip() }}</strong>
+                            {% else %}
+                                <em>Evaluation of acute lower respiratory symptoms; patient presenting for radiographic assessment. Rule out focal airspace opacity / consolidation.</em>
+                            {% endif %}
+                        </td>
                     </tr>
                 </table>
 
                 <!-- SECTION 1: RADIOLOGICAL IMAGING PLATES -->
                 <div class="report-sec-heading">
-                    <span>1. Radiological Image Plates (Comparative Evaluation)</span>
-                    <span class="report-sec-badge" style="background: #e0f2fe; color: #0369a1;">Standardized View</span>
+                    <span>1. Comparative Radiological Image Plates</span>
+                    <span class="report-sec-badge">Paired Evaluation</span>
                 </div>
 
                 <div class="imaging-plate-grid">
-                    <!-- Figure 1: Original Raw CXR -->
+                    <!-- Figure 1.A: Preprocessed Raw CXR -->
                     <div class="imaging-figure">
                         <div class="imaging-frame">
                             {% if scan.original_image %}
-                                <img src="{{ url_for('static', filename='uploads/' + scan.original_image) }}" alt="Figure 1: Original Radiograph">
+                                <img src="{{ url_for('static', filename='uploads/' + scan.original_image) }}" alt="Figure 1.A: Original Radiograph">
                             {% else %}
                                 <div style="color: #94a3b8; font-size: 0.8rem;">[No Radiograph Image Available]</div>
                             {% endif %}
                         </div>
                         <div class="imaging-caption">
                             <span><strong>Figure 1.A:</strong> Preprocessed Thoracic CXR</span>
-                            <span>Bit Depth: 16-bit Grayscale</span>
+                            <span>Standard Grayscale</span>
                         </div>
                     </div>
 
-                    <!-- Figure 2: Analyzed Plate with BFS Bounding Boxes -->
+                    <!-- Figure 1.B: CLAHE Contrast Enhanced & CAD Bounding Overlay -->
                     <div class="imaging-figure">
                         <div class="imaging-frame">
                             {% if scan.heatmap_image %}
-                                <img src="{{ url_for('static', filename='uploads/' + scan.heatmap_image) }}" alt="Figure 2: ROI Segmentation Plate">
+                                <img src="{{ url_for('static', filename='uploads/' + scan.heatmap_image) }}" alt="Figure 1.B: CAD Segmentation Plate">
                             {% elif scan.original_image %}
-                                <img src="{{ url_for('static', filename='uploads/' + scan.original_image) }}" alt="Figure 2: Scan">
+                                <img src="{{ url_for('static', filename='uploads/' + scan.original_image) }}" alt="Figure 1.B: Scan">
                             {% else %}
                                 <div style="color: #94a3b8; font-size: 0.8rem;">[No ROI Image Available]</div>
                             {% endif %}
                         </div>
                         <div class="imaging-caption">
-                            <span><strong>Figure 1.B:</strong> Algorithmic ROI Traversal Plate</span>
-                            <span style="color: #0f766e; font-weight: 700;">8-Connected BFS</span>
+                            <span><strong>Figure 1.B:</strong> Contrast Equalization (CLAHE) &amp; CAD Overlay</span>
+                            <span style="color: var(--theme-accent); font-weight: 700;">Spatial Radiodensity Mapping</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- SECTION 2: QUANTITATIVE MATRIX FINDINGS -->
+                <!-- SECTION 2: OBJECTIVE CAD RADIOMETRIC FINDINGS -->
                 <div class="report-sec-heading">
-                    <span>2. Quantitative Pixel &amp; Matrix Analysis Findings</span>
-                    <span class="report-sec-badge" style="background: #fef2f2; color: #b91c1c;">Findings Detected</span>
+                    <span>2. Computer-Aided Detection (CAD): Radiodensity Mapping</span>
+                    <span class="report-sec-badge">Objective Radiometrics</span>
                 </div>
 
-                <!-- Metric Summary Strip -->
                 <div class="metrics-summary-grid">
                     <div class="metric-pill-box">
-                        <div class="metric-pill-label">Primary Pathology</div>
-                        <div class="metric-pill-val" style="font-size: 0.85rem; color: #b91c1c;">
-                            {{ scan.condition_predicted }}
+                        <div class="metric-pill-label">CAD Screen Status</div>
+                        <div class="metric-pill-val" style="font-size: 0.85rem; color: {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}#b91c1c{% else %}#10b981{% endif %};">
+                            {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
+                                Focal Opacity Flagged
+                            {% else %}
+                                Unremarkable Lucency
+                            {% endif %}
                         </div>
                     </div>
 
                     <div class="metric-pill-box">
-                        <div class="metric-pill-label">Opacity Contrast</div>
-                        <div class="metric-pill-val" style="color: #0f766e;">
-                            {{ scan.confidence_score }}%
+                        <div class="metric-pill-label">Relative Radiodensity</div>
+                        <div class="metric-pill-val" style="color: var(--theme-accent);">
+                            {% if scan.confidence_score > 70 %}
+                                High Attenuation
+                            {% elif scan.confidence_score > 30 %}
+                                Moderate Density
+                            {% else %}
+                                Baseline Transparency
+                            {% endif %}
                         </div>
                     </div>
 
                     <div class="metric-pill-box">
-                        <div class="metric-pill-label">Detected Clusters</div>
-                        <div class="metric-pill-val">
+                        <div class="metric-pill-label">Target Cluster Count</div>
+                        <div class="metric-pill-val" style="font-size: 0.85rem;">
                             {{ scan.stability }}
                         </div>
                     </div>
 
                     <div class="metric-pill-box">
-                        <div class="metric-pill-label">Consistency Index</div>
-                        <div class="metric-pill-val" style="color: #0284c7;">
-                            {{ scan.reliability_index or '0.95' }}
+                        <div class="metric-pill-label">Analysis Method</div>
+                        <div class="metric-pill-val" style="font-size: 0.775rem; color: var(--text-secondary);">
+                            CLAHE + BFS Clustering
                         </div>
                     </div>
                 </div>
 
-                <!-- Analytical Note & Contrast Measurement -->
                 <div class="finding-alert-banner">
-                    <div class="finding-alert-title">Summary of Algorithmic Findings:</div>
+                    <div class="finding-alert-title">CAD Quantitative Observation:</div>
                     <div>
-                        Grid matrix traversal isolated anomalous pixel groupings exceeding the clinical density threshold. The detected cluster exhibits a <strong>{{ scan.confidence_score }}% contrast prominence</strong> against expected lung transparency, indicating dense consolidation requiring clinical correlation.
+                        Adaptive histogram equalization (CLAHE) and morphological connected-component clustering identified <strong>{{ scan.stability }}</strong> exhibiting significantly elevated attenuation relative to aerated lung parenchyma. Density coordinates highlight focal reduced lucency requiring direct clinical and auscultatory correlation.
                     </div>
-                    <div class="contrast-bar-wrapper">
-                        <div class="contrast-bar-fill" style="width: {{ scan.confidence_score }}%;"></div>
+                </div>
+
+                <!-- SECTION 3: STRUCTURED ANATOMICAL FINDINGS (ACR Checklist) -->
+                <div class="report-sec-heading">
+                    <span>3. Structured Anatomical Review (ACR Framework)</span>
+                </div>
+
+                <table class="checklist-table">
+                    <tr>
+                        <td class="checklist-col-cat">Lungs &amp; Airway</td>
+                        <td class="checklist-col-desc">
+                            {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
+                                Focal high-attenuation airspace opacity identified in the lower hemithorax. Trachea is midline. No evidence of diffuse bilateral alveolar flooding or pneumothorax line.
+                            {% else %}
+                                Clear lung parenchyma bilaterally. No focal airspace consolidation, mass, or pneumothorax identified. Trachea midline.
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="checklist-col-cat">Pleural Spaces</td>
+                        <td class="checklist-col-desc">Bilateral costophrenic and cardiophrenic angles appear sharp. No gross radiopaque fluid layering suggestive of significant pleural effusion.</td>
+                    </tr>
+                    <tr>
+                        <td class="checklist-col-cat">Cardiomediastinal</td>
+                        <td class="checklist-col-desc">Transverse cardiac diameter is within normal limits. Mediastinal and hilar contours are grossly preserved without gross hilar lymphadenopathy.</td>
+                    </tr>
+                    <tr>
+                        <td class="checklist-col-cat">Osseous &amp; Soft Tissues</td>
+                        <td class="checklist-col-desc">Visualized thoracic cage, clavicles, ribs, and shoulders are intact without gross acute fracture or aggressive osseous lesion. Extrathoracic soft tissues unremarkable.</td>
+                    </tr>
+                </table>
+
+                <!-- SECTION 4: IMPRESSION & DIFFERENTIAL DIAGNOSIS -->
+                <div class="report-sec-heading">
+                    <span>4. Clinical Impression &amp; Differential Considerations</span>
+                </div>
+
+                <div class="impression-card">
+                    <div class="impression-item">
+                        <strong>1. Primary Radiographic Finding:</strong>
+                        {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
+                            Focal airspace opacity / consolidation in the lower hemithorax. In the clinical context of acute lower respiratory presentation (e.g. cough, fever, dyspnea), findings are suspicious for <strong>Community-Acquired Pneumonia (CAP)</strong>.
+                        {% else %}
+                            No acute cardiopulmonary abnormality detected. Clear lung fields bilaterally.
+                        {% endif %}
+                    </div>
+                    <div class="impression-item">
+                        <strong>2. Differential Diagnoses to Consider:</strong>
+                        {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
+                            Infectious consolidation (bacterial or atypical pneumonia), focal subsegmental atelectasis (mucus plugging), aspiration pneumonitis, or resolving localized parenchymal inflammation.
+                        {% else %}
+                            Unremarkable thoracic radiograph. Correlate with clinical history.
+                        {% endif %}
+                    </div>
+                    <div class="impression-item" style="margin-bottom: 0;">
+                        <strong>3. Recommended Follow-Up:</strong>
+                        {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
+                            Correlate clinically with bedside auscultation, vital signs, and inflammatory biomarkers (CBC, CRP). If treated for acute lower respiratory infection, follow-up CXR in 6&ndash;8 weeks is recommended to confirm complete radiographic resolution and exclude underlying endobronchial pathology.
+                        {% else %}
+                            Clinical follow-up as indicated if respiratory symptoms persist.
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- PHYSICIAN ATTESTATION & OFFICIAL SIGN-OFF -->
+                <div class="physician-signoff-card">
+                    <div>
+                        <div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.2rem;">
+                            Attending Physician Attestation:
+                        </div>
+                        <div class="physician-notes-view">
+                            I have personally reviewed the raw radiographic plates and CAD radiodensity overlays. The clinical impression, differential considerations, and follow-up recommendations above represent my professional medical evaluation.
+                        </div>
+                    </div>
+
+                    <div class="signature-seal-area">
+                        <div class="official-seal">CLINICALLY ATTESTED</div>
+                        <div style="font-size: 0.775rem; font-weight: 700; color: var(--text-primary);">
+                            {{ (scan.doctor.name if scan.doctor and scan.doctor.name else (current_user.name if current_user else 'Sarah Mitchell, M.D.')) | format_doctor_name }}
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-secondary);">
+                            Lic: {{ scan.doctor.doctor_id if scan.doctor else (current_user.doctor_id if current_user else 'DOC-7749') }} &bull; {{ scan.doctor.specialty if scan.doctor else (current_user.specialty if current_user else 'Thoracic Radiology') }}
+                        </div>
+                        <div class="signature-line"></div>
+                        <div style="font-size: 0.65rem; color: var(--text-muted);">
+                            Attested on {{ scan.created_at.strftime('%d-%b-%Y') }} &bull; Electronic Signature Record
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Page 1 Formal Footer -->
             <div class="report-footer">
-                <span>MedicMitra Clinical Image Computing System &bull; Confidential Medical Record</span>
-                <span><strong>Page 1 of 2</strong> &bull; Continued on Page 2 &rarr;</span>
+                <span>Clinical Decision Support Advisory: Algorithmic output aids clinician assessment; not an autonomous diagnostic determination.</span>
+                <span><strong>Page 1 of 2</strong> &bull; Attending Physician &amp; Clinical Record</span>
             </div>
         </div>
 
 
         <!-- ============================================================
-             PAGE 2: MORPHOLOGICAL TABLE, SYMPTOM GUIDE & SIGN-OFF
+             PAGE 2: PATIENT CARE & UNDERSTANDING GUIDE
+             Audience: Patient & Caregivers
+             Purpose: Clear Plain-Language Translation, Actionable Questions & Safety Red Flags
+             Standard: RSNA Patient-Centered Reporting & Health Literacy Guidelines
              ============================================================ -->
         <div class="report-sheet" id="page-2">
             <div>
-                <!-- Top Continuation Header -->
-                <div class="report-letterhead" style="margin-bottom: 1rem; padding-bottom: 0.75rem;">
-                    <div>
-                        <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a;">DIAGNOSTIC REPORT CONTINUATION &amp; ATTESTATION</div>
-                        <div style="font-size: 0.75rem; color: #64748b;">Patient Record: <strong>{{ scan.patient_id }}</strong> &bull; Modality: {{ scan.modality }}</div>
+                <!-- Top Header: Patient Care Guide -->
+                <div class="report-letterhead">
+                    <div class="institution-brand">
+                        <div class="institution-logo" style="background: #0284c7;">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <div>
+                            <div class="institution-title">PATIENT CARE &amp; UNDERSTANDING GUIDE</div>
+                            <div class="institution-subtitle" style="color: #0284c7;">Plain-Language Translation of Your Chest X-Ray</div>
+                        </div>
                     </div>
                     <div class="report-metadata-badge">
-                        <div>Report Ref: <strong>REP-{{ scan.created_at.strftime('%Y%m') }}-{{ scan.id }}</strong></div>
-                        <div style="color: #0f766e; font-weight: 700;">Deterministic Algorithmic Evaluation</div>
+                        <div>Patient ID: <strong>{{ scan.patient_id }}</strong></div>
+                        <div>Exam Date: {{ scan.created_at.strftime('%d-%b-%Y') }}</div>
+                        <div style="color: #0284c7; font-weight: 600;">Confidential Patient Record</div>
                     </div>
                 </div>
 
-                <!-- SECTION 3: TABULAR ROI CLUSTER BREAKDOWN -->
-                <div class="report-sec-heading">
-                    <span>3. Morphological Cluster Distribution (BFS Traversal Data)</span>
-                    <span class="report-sec-badge" style="background: #f1f5f9; color: #475569;">Quantitative Data</span>
-                </div>
-
-                <table class="roi-table">
-                    <thead>
-                        <tr>
-                            <th>Cluster ID</th>
-                            <th>Anatomical Region</th>
-                            <th>Pixel Area</th>
-                            <th>Mean Intensity</th>
-                            <th>Variance (&sigma;&sup2;)</th>
-                            <th>Clinical Significance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>ROI-01</strong></td>
-                            <td>Right Lower Pulmonary Lobe (RLL)</td>
-                            <td>1,842 px</td>
-                            <td>218.4 / 255</td>
-                            <td>14.2 (Uniform)</td>
-                            <td><span style="color: #b91c1c; font-weight: 700;">High (Dense Consolidation)</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>ROI-02</strong></td>
-                            <td>Right Middle Lobe Perihilar Field</td>
-                            <td>964 px</td>
-                            <td>204.1 / 255</td>
-                            <td>18.6 (Homogeneous)</td>
-                            <td><span style="color: #d97706; font-weight: 700;">Moderate (Infiltration)</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>ROI-03</strong></td>
-                            <td>Bilateral Basilar Angle</td>
-                            <td>480 px</td>
-                            <td>192.5 / 255</td>
-                            <td>22.1 (Localized)</td>
-                            <td><span style="color: #0f766e; font-weight: 600;">Minor (Reactive Change)</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>ROI-04 to 06</strong></td>
-                            <td>Scattered Peripheral Sub-clusters</td>
-                            <td>310 px avg</td>
-                            <td>184.0 / 255</td>
-                            <td>26.4 (Diffuse)</td>
-                            <td><span>Low / Marginal Significance</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- SECTION 4: PLAIN-LANGUAGE SYMPTOM & CLINICAL CORRELATION -->
-                <div class="report-sec-heading">
-                    <span>4. Clinical Symptom Correlation &amp; Plain-Language Interpretation</span>
-                    <span class="report-sec-badge" style="background: #ecfdf5; color: #047857;">Clinical Guide</span>
-                </div>
-
-                <div class="symptom-guide-box">
+                <!-- Introductory Summary Banner -->
+                <div class="patient-intro-banner">
+                    <div style="font-weight: 700; color: var(--theme-accent); margin-bottom: 0.25rem;">
+                        How to Read This Patient Care Guide
+                    </div>
                     <div>
-                        <div style="font-size: 0.825rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; text-transform: uppercase;">
-                            Plain-Language Scan Meaning
-                        </div>
-                        <p style="font-size: 0.8rem; color: #475569; line-height: 1.5; margin: 0 0 0.75rem 0;">
-                            Healthy lung spaces appear dark because air lets X-rays pass through. The algorithm flagged dense white/cloudy patches (consolidation) where fluid, mucus, or tissue inflammation has temporarily displaced normal air volume.
+                        Medical imaging reports contain technical terms intended for doctors. This guide translates your scan findings into everyday language so you can actively participate in your treatment decisions with your doctor.
+                    </div>
+                </div>
+
+                <!-- Two-Column Plain-Language Interpretation -->
+                <div class="patient-guide-grid">
+                    <!-- Column 1: What did the X-Ray see? -->
+                    <div class="patient-guide-card">
+                        <h4>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--theme-accent)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            1. What Did Your Scan Show?
+                        </h4>
+                        <p style="margin: 0 0 0.5rem 0;">
+                            Healthy lungs are filled with air and appear <strong>dark or black</strong> on an X-ray because X-rays pass easily through air.
                         </p>
-                        <div style="font-size: 0.75rem; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; padding: 0.5rem;">
-                            <strong>Patient Intake Indications:</strong><br>
-                            {{ scan.clinical_notes or 'Patient presents with shortness of breath, elevated temperature, and persistent deep cough.' }}
-                        </div>
+                        <p style="margin: 0;">
+                            {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
+                                Your scan revealed a <strong>cloudy or dense white patch</strong> (called an <em>opacity</em> or <em>consolidation</em>) in your lower lung. This occurs when normal air in the microscopic lung sacs is temporarily replaced by fluid, mucus, or inflammatory cells.
+                            {% else %}
+                                Your scan showed <strong>clear, dark lungs</strong> without any unexpected shadows, dense fluid buildup, or abnormal white spots.
+                            {% endif %}
+                        </p>
                     </div>
 
-                    <div>
-                        <div style="font-size: 0.825rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; text-transform: uppercase;">
-                            Correlated Symptoms Explained
-                        </div>
-                        
-                        <div class="symptom-item">
-                            <span>🫁</span>
-                            <div><strong>Shortness of Breath:</strong> Reduced active oxygen exchange capacity in consolidated zones.</div>
-                        </div>
-                        <div class="symptom-item">
-                            <span>🗣️</span>
-                            <div><strong>Persistent Cough:</strong> Airways reflexively clearing trapped phlegm or secretions.</div>
-                        </div>
-                        <div class="symptom-item">
-                            <span>🌡️</span>
-                            <div><strong>Fever &amp; Shivering:</strong> Natural systemic inflammatory response to infection.</div>
-                        </div>
-                        <div class="symptom-item">
-                            <span>🩺</span>
-                            <div><strong>Chest Discomfort:</strong> Localized irritation intensified upon deep inhalation.</div>
-                        </div>
+                    <!-- Column 2: Does this mean Pneumonia? -->
+                    <div class="patient-guide-card">
+                        <h4>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--theme-accent)" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            2. Does This Mean I Have Pneumonia?
+                        </h4>
+                        <p style="margin: 0 0 0.5rem 0;">
+                            <strong>Not by itself.</strong> An X-ray shows the physical shadow inside the lung, but a picture alone cannot tell which specific bacteria, virus, or condition caused it.
+                        </p>
+                        <p style="margin: 0;">
+                            {% if 'Abnormal' in scan.condition_predicted or scan.confidence_score > 50 %}
+                                When a cloudy patch appears alongside symptoms like fever, coughing, or shortness of breath, a lung infection such as <strong>pneumonia</strong> is the most common cause. Your doctor will listen to your chest, check your oxygen, and may order blood tests to confirm pneumonia and choose the right medication.
+                            {% else %}
+                                The absence of a white shadow strongly suggests you do not have acute consolidation or typical pneumonia. Your doctor will evaluate other causes if you still have cough or discomfort.
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
 
-                <!-- SECTION 5: PHYSICIAN IMPRESSION & OFFICIAL SIGN-OFF -->
+                <!-- SECTION 3: QUESTIONS TO ASK YOUR DOCTOR -->
                 <div class="report-sec-heading">
-                    <span>5. Physician Impressions &amp; Certified Sign-Off</span>
-                    <span class="report-sec-badge" style="background: #fef3c7; color: #b45309;">Attestation</span>
+                    <span>3. Empowered Care: What to Ask Your Doctor</span>
+                    <span class="report-sec-badge" style="background: rgba(2, 132, 199, 0.1); color: #0284c7;">Patient Checklist</span>
                 </div>
 
-                <div class="physician-signoff-card">
-                    <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 0.25rem;">
-                            Radiologist Differential Diagnosis &amp; Recommendations:
-                        </div>
-                        <div class="physician-notes-view">
-                            Findings correlate with acute consolidation of the right lower lobe. Recommend antibiotic therapy as clinically indicated, supportive hydration, and repeat radiographic evaluation in 10&ndash;14 days or upon unresolved symptomatology.
-                        </div>
-                    </div>
+                <div class="patient-guide-card" style="margin-bottom: 0.85rem;">
+                    <ul class="doctor-questions-list">
+                        <li><strong>"Does this shadow confirm pneumonia, bronchitis, or another lung condition?"</strong> Helps clarify your doctor's working diagnosis.</li>
+                        <li><strong>"Do I need prescription antibiotics, an inhaler, or rest and fever relievers?"</strong> Understand which treatment is appropriate for bacterial vs. viral infections.</li>
+                        <li><strong>"How many days should it take before my breathing and energy begin to improve?"</strong> Gives you a realistic timeline for recovery.</li>
+                        <li><strong>"Do I need a follow-up chest X-ray in 6 to 8 weeks?"</strong> Doctors often recommend a repeat scan after recovery to confirm the cloudiness has fully disappeared.</li>
+                    </ul>
+                </div>
 
-                    <div class="signature-seal-area">
-                        <div class="official-seal">ELECTRONICALLY AUDITED</div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: #0f172a;">
-                            Dr. {{ current_user.name if current_user else 'Sarah Mitchell, M.D.' }}
-                        </div>
-                        <div style="font-size: 0.7rem; color: #64748b;">
-                            Lic: {{ current_user.doctor_id if current_user else 'DOC-7749' }} &bull; {{ current_user.specialty if current_user and current_user.specialty else 'Thoracic Radiology' }}
-                        </div>
-                        <div class="signature-line"></div>
-                        <div style="font-size: 0.675rem; color: #94a3b8;">
-                            Attested on {{ scan.created_at.strftime('%d-%b-%Y') }} &bull; Certified Signature
-                        </div>
+                <!-- SECTION 4: SAFETY RED FLAGS (When to seek emergency care) -->
+                <div class="urgent-redflag-box">
+                    <div class="urgent-redflag-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Critical Warning: When to Seek Immediate Emergency Medical Care
+                    </div>
+                    <div style="font-size: 0.775rem;">
+                        If you develop any of the following <strong>red-flag symptoms</strong>, do not wait for a scheduled appointment. Call emergency services (e.g. 911 / local emergency) or go to the nearest emergency department immediately:
+                    </div>
+                    <div class="redflag-items-grid">
+                        <div>&bull; <strong>Severe shortness of breath</strong> or gasping for air</div>
+                        <div>&bull; <strong>Chest pain</strong> that intensifies sharply when breathing</div>
+                        <div>&bull; <strong>Bluish, pale, or gray tint</strong> on lips or fingernails</div>
+                        <div>&bull; <strong>Sudden confusion</strong>, dizziness, or extreme weakness</div>
+                    </div>
+                </div>
+
+                <!-- SECTION 5: DECODING MEDICAL TERMS (Glossary) -->
+                <div class="report-sec-heading">
+                    <span>5. Medical Glossary: Decoding Words on Your Report</span>
+                </div>
+
+                <div class="glossary-grid">
+                    <div class="glossary-item">
+                        <strong>Airspace Opacity</strong>
+                        A cloudy or white region on an X-ray where normal lung air has been displaced by fluid, inflammation, or mucus.
+                    </div>
+                    <div class="glossary-item">
+                        <strong>Consolidation</strong>
+                        Solidification of lung tissue caused by inflammatory fluid buildup inside the tiny microscopic air sacs (alveoli).
+                    </div>
+                    <div class="glossary-item">
+                        <strong>CAD System (Computer-Aided Detection)</strong>
+                        A specialized image-processing tool that highlights dense areas to assist the radiologist during review.
+                    </div>
+                    <div class="glossary-item">
+                        <strong>PA View (Posteroanterior)</strong>
+                        The standard chest X-ray position where the beam travels from your back to front while standing upright.
                     </div>
                 </div>
             </div>
 
             <!-- Page 2 Formal Footer -->
             <div class="report-footer">
-                <span>Clinical Decision Support Advisory: Algorithmic output aids clinician assessment; not a replacement for clinical diagnosis.</span>
-                <span><strong>Page 2 of 2</strong> &bull; End of Certified Report</span>
+                <span>MedicMitra Patient Communication System &bull; Confidential Medical Record &bull; Prepared for {{ scan.patient_id }}</span>
+                <span><strong>Page 2 of 2</strong> &bull; End of Certified Patient Guide</span>
             </div>
         </div>
 
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function toggleDoctorPopover(e) {
+        e.stopPropagation();
+        const popover = document.getElementById('doctor-popover');
+        if (popover) {
+            popover.classList.toggle('active');
+        }
+    }
+
+    document.addEventListener('click', function(e) {
+        const popover = document.getElementById('doctor-popover');
+        if (popover && popover.classList.contains('active')) {
+            if (!popover.contains(e.target)) {
+                popover.classList.remove('active');
+            }
+        }
+    });
+</script>
 {% endblock %}

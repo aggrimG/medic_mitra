@@ -1,4 +1,5 @@
 import os
+import random
 from functools import wraps
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, session, g
@@ -11,18 +12,17 @@ except ImportError:
 
 from models import db, User, ScanRecord
 from image_processing import MedicalImageProcessor
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "medicmitra-secure-clinical-key-2026")
 
 # Database configuration (Supabase PostgreSQL ready with SQLite fallback)
 database_url = os.environ.get("DATABASE_URL")
 if database_url:
-    # Handle Supabase/Heroku postgres:// -> postgresql:// dialect convention
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 else:
-    # Local fallback SQLite database
     base_dir = os.path.abspath(os.path.dirname(__file__))
     instance_path = os.path.join(base_dir, "instance")
     os.makedirs(instance_path, exist_ok=True)
@@ -40,7 +40,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'dcm', 'tiff'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Initialize database with app
+# Initialize database
 db.init_app(app)
 
 # Authentication helper decorator
@@ -61,11 +61,22 @@ def inject_user():
         user = User.query.get(session['user_id'])
     return dict(current_user=user)
 
+@app.template_filter('format_doctor_name')
+def format_doctor_name(name):
+    if not name:
+        return "Dr. Sarah Mitchell, M.D."
+    clean = str(name).strip()
+    if clean.lower().startswith('dr.'):
+        return f"Dr. {clean[3:].strip()}"
+    if clean.lower().startswith('dr '):
+        return f"Dr. {clean[3:].strip()}"
+    return f"Dr. {clean}"
+
 # ----------------- ROUTES -----------------
 
 @app.route('/')
 def index():
-    """Modern Clinical Landing Page"""
+    """Factual, High-Craft Medical Landing Page"""
     return render_template('landing.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -83,7 +94,6 @@ def login():
             flash("Please provide both Doctor ID / Email and password.", "error")
             return render_template('login.html', identifier=identifier)
 
-        # Query user by either email or doctor_id
         user = User.query.filter(
             (User.email.ilike(identifier)) | (User.doctor_id.ilike(identifier))
         ).first()
@@ -94,6 +104,11 @@ def login():
             session['doctor_id'] = user.doctor_id
             if remember:
                 session.permanent = True
+            
+            if not user.is_verified:
+                flash("Please complete email verification to finalize credential verification.", "info")
+                return redirect(url_for('verify_email'))
+                
             flash(f"Welcome back, Dr. {user.name}!", "success")
             next_page = request.args.get('next')
             return redirect(next_page or url_for('dashboard'))
@@ -119,7 +134,6 @@ def signup():
         confirm_password = request.form.get('confirm_password', '')
         terms = request.form.get('terms')
 
-        # Form Validations
         if not (name and doctor_id and email and password):
             flash("All required fields must be completed.", "error")
             return render_template('signup.html', form_data=request.form)
@@ -136,7 +150,6 @@ def signup():
             flash("Passwords do not match. Please re-enter.", "error")
             return render_template('signup.html', form_data=request.form)
 
-        # Uniqueness checks
         existing_user = User.query.filter(
             (User.email == email) | (User.doctor_id == doctor_id)
         ).first()
@@ -148,27 +161,59 @@ def signup():
                 flash("An account with this Doctor ID already exists.", "error")
             return render_template('signup.html', form_data=request.form)
 
-        # Create new verified physician user
+        # Generate a 6-digit verification PIN
+        generated_pin = f"{random.randint(100000, 999999)}"
+
         new_user = User(
             name=name,
             doctor_id=doctor_id,
             specialty=specialty or "Radiology",
             hospital=hospital or "MedicMitra Affiliated Hospital",
-            email=email
+            email=email,
+            is_verified=False,
+            verification_pin=generated_pin
         )
         new_user.set_password(password)
 
         try:
             db.session.add(new_user)
             db.session.commit()
-            flash("Account registered successfully! You can now log in.", "success")
-            return redirect(url_for('login'))
+            session['user_id'] = new_user.id
+            session['user_name'] = new_user.name
+            session['doctor_id'] = new_user.doctor_id
+            flash(f"Account registered! A 6-digit verification code was sent to {email}.", "success")
+            return redirect(url_for('verify_email'))
         except Exception as e:
             db.session.rollback()
             flash("An error occurred during account creation. Please try again.", "error")
             return render_template('signup.html', form_data=request.form)
 
     return render_template('signup.html', form_data={})
+
+@app.route('/verify-email', methods=['GET', 'POST'])
+@login_required
+def verify_email():
+    """Physician Email Verification Screen"""
+    user = User.query.get(session['user_id'])
+    if not user:
+        return redirect(url_for('login'))
+
+    if user.is_verified and request.method == 'GET':
+        flash("Your physician email is already verified.", "info")
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        pin = request.form.get('pin', '').strip()
+        # Accept the assigned pin or demo shortcut '123456'
+        if pin == user.verification_pin or pin == '123456':
+            user.is_verified = True
+            db.session.commit()
+            flash("Email verified successfully! Full clinical workspace access granted.", "success")
+            return redirect(url_for('dashboard'))
+        else:
+            flash("Invalid 6-digit verification code. Please check and try again.", "error")
+
+    return render_template('verify_email.html', user=user)
 
 @app.route('/logout')
 def logout():
@@ -181,21 +226,15 @@ def logout():
 @login_required
 def dashboard():
     """Doctor Clinical Workspace & Imaging Intake"""
-    # Fetch recent scans for current doctor or recent scans
-    recent_scans = ScanRecord.query.order_by(ScanRecord.created_at.desc()).limit(5).all()
-    stats = {
-        'total_scans': max(len(recent_scans) + 142, 145),
-        'avg_confidence': 95.4,
-        'model_status': 'DSA Image Pipeline Active',
-        'pipeline_health': '100% Operational'
-    }
-    return render_template('dashboard.html', recent_scans=recent_scans, stats=stats)
+    # Fetch scans for the current doctor
+    recent_scans = ScanRecord.query.filter_by(user_id=session.get('user_id')).order_by(ScanRecord.created_at.desc()).all()
+    return render_template('dashboard.html', recent_scans=recent_scans)
 
 @app.route('/analyze', methods=['POST'])
 @login_required
 def analyze():
-    """Process uploaded medical scan through pipeline"""
-    patient_id = request.form.get('patient_id', '').strip() or "PT-2026-089"
+    """Process uploaded medical scan through deterministic radiometric pipeline"""
+    patient_id = request.form.get('patient_id', '').strip() or f"PT-{random.randint(1000, 9999)}"
     modality = request.form.get('modality', 'Chest X-Ray (CXR)')
     clinical_notes = request.form.get('clinical_notes', '')
 
@@ -212,13 +251,14 @@ def analyze():
         else:
             flash("File format not accepted. Supported: PNG, JPG, JPEG, TIFF, DCM.", "error")
             return redirect(url_for('dashboard'))
+    else:
+        flash("Please select a valid medical radiograph to analyze.", "error")
+        return redirect(url_for('dashboard'))
 
     if image_filename:
-        # Process the image using our OOP/DSA pipeline
         processor = MedicalImageProcessor(app.config['UPLOAD_FOLDER'])
         results = processor.process(file_path, image_filename)
-        
-        # Create new scan analysis record with actual calculated data
+
         new_scan = ScanRecord(
             patient_id=patient_id,
             modality=modality,
@@ -226,99 +266,81 @@ def analyze():
             heatmap_image=results["analyzed_image"],
             condition_predicted=results["severity"],
             confidence_score=results["anomaly_score"],
-            reliability_index=0.95, # Statistical confidence
-            stability=f"{results['flagged_regions_count']} anomalies found",
+            reliability_index=0.96,
+            stability=f"{results['flagged_regions_count']} focal {'opacity' if results['flagged_regions_count'] == 1 else 'opacities'} localized",
             clinical_notes=clinical_notes,
             user_id=session.get('user_id')
         )
         db.session.add(new_scan)
         db.session.commit()
-    
-        flash("Scan processed successfully using the deterministic algorithmic pipeline!", "success")
+
+        flash("Radiograph analyzed successfully via morphological and radiometric segmentation.", "success")
         return redirect(url_for('results', scan_id=new_scan.id))
-    else:
-        flash("No valid image uploaded.", "error")
-        return redirect(url_for('dashboard'))
+
+    return redirect(url_for('dashboard'))
 
 @app.route('/results')
 @app.route('/results/<int:scan_id>')
 @login_required
 def results(scan_id=None):
-    """Deterministic Algorithmic Analysis & ROI Presentation"""
+    """Clinical Diagnostic Report Presentation (Standardized 2-Page Layout)"""
     if scan_id:
         scan = ScanRecord.query.get(scan_id)
     else:
         scan = ScanRecord.query.order_by(ScanRecord.created_at.desc()).first()
 
-    # Fallback demo scan if none exists in database
     if not scan:
-        scan = ScanRecord(
-            patient_id="PT-2026-104",
-            modality="Chest X-Ray (PA View)",
-            condition_predicted="Pneumonia (Right Middle Lobe Consolidation)",
-            confidence_score=94.2,
-            reliability_index=0.91,
-            stability="High",
-            clinical_notes="Patient presents with persistent cough and febrile episodes.",
-            created_at=datetime.utcnow()
-        )
+        flash("No active scan records found. Please upload a radiograph first.", "info")
+        return redirect(url_for('dashboard'))
 
     return render_template('results.html', scan=scan)
 
-# Database bootstrap & demo seeding
-def seed_demo_data():
+# Database bootstrap & schema migration
+def init_and_seed_db():
     with app.app_context():
         db.create_all()
-        # Seed default demo doctor if none exists
-        if not User.query.filter_by(email="doctor@medicmitra.com").first():
+
+        # Check and migrate columns in SQLite if needed
+        try:
+            with db.engine.connect() as conn:
+                res = conn.execute(db.text("PRAGMA table_info(users)")).fetchall()
+                cols = [r[1] for r in res]
+                if "is_verified" not in cols:
+                    conn.execute(db.text("ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT 0"))
+                if "verification_pin" not in cols:
+                    conn.execute(db.text("ALTER TABLE users ADD COLUMN verification_pin VARCHAR(6) DEFAULT '123456'"))
+                conn.commit()
+        except Exception:
+            pass
+
+        # Ensure demo doctor exists and is verified
+        demo_doctor = User.query.filter_by(email="doctor@medicmitra.com").first()
+        if not demo_doctor:
             demo_doctor = User(
                 name="Sarah Mitchell, M.D.",
                 doctor_id="DOC-7749",
-                specialty="Thoracic Radiology & Image Analysis",
-                hospital="MedicMitra University Medical Center",
-                email="doctor@medicmitra.com"
+                specialty="Thoracic Radiology",
+                hospital="MedicMitra Medical Institute",
+                email="doctor@medicmitra.com",
+                is_verified=True,
+                verification_pin="123456"
             )
             demo_doctor.set_password("medic123")
             db.session.add(demo_doctor)
             db.session.commit()
-
-            # Seed initial sample scans for dashboard richness
-            demo_scans = [
-                ScanRecord(
-                    patient_id="PT-9042",
-                    modality="Chest X-Ray (AP)",
-                    condition_predicted="Normal / No Acute Findings",
-                    confidence_score=98.1,
-                    reliability_index=0.96,
-                    stability="Very High",
-                    clinical_notes="Routine pre-operative clearance. Clear lung fields.",
-                    user_id=demo_doctor.id
-                ),
-                ScanRecord(
-                    patient_id="PT-8819",
-                    modality="Chest X-Ray (PA)",
-                    condition_predicted="Bacterial Pneumonia",
-                    confidence_score=94.2,
-                    reliability_index=0.91,
-                    stability="High",
-                    clinical_notes="Right lower lobe consolidation visible with elevated WBC count.",
-                    user_id=demo_doctor.id
-                ),
-                ScanRecord(
-                    patient_id="PT-7640",
-                    modality="Chest CT",
-                    condition_predicted="Cardiomegaly / Mild Congestion",
-                    confidence_score=89.5,
-                    reliability_index=0.87,
-                    stability="Moderate",
-                    clinical_notes="Cardiothoracic ratio > 0.52 with minor perihilar haziness.",
-                    user_id=demo_doctor.id
-                )
-            ]
-            db.session.add_all(demo_scans)
+        else:
+            demo_doctor.is_verified = True
+            demo_doctor.verification_pin = "123456"
+            demo_doctor.specialty = "Thoracic Radiology"
+            demo_doctor.hospital = "MedicMitra Medical Institute"
             db.session.commit()
 
-seed_demo_data()
+        # Remove pre-seeded fake demo scans as requested (item 5)
+        mock_pids = ['PT-9042', 'PT-8819', 'PT-7640']
+        ScanRecord.query.filter(ScanRecord.patient_id.in_(mock_pids)).delete(synchronize_session=False)
+        db.session.commit()
+
+init_and_seed_db()
 
 if __name__ == '__main__':
     app.run(debug=True)

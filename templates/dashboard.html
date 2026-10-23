@@ -1,118 +1,137 @@
 {% extends 'base.html' %}
 
-{% block title %}Clinical Dashboard | MedicMitra{% endblock %}
+{% block title %}Clinical Dashboard | MedicMitra Radiomics{% endblock %}
 
 {% block nav %}
 <header class="workspace-topbar">
     <div class="workspace-topbar-inner">
         <div class="topbar-left">
-            <a href="{{ url_for('dashboard') }}" class="brand-logo" style="font-size: 1.15rem;">
-                <div class="brand-badge-icon" style="width: 32px; height: 32px;">
+            <a href="{{ url_for('index') }}" class="brand-logo" title="Return to MedicMitra Home">
+                <div class="brand-badge-icon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                 </div>
-                <span>Medic<span style="color: var(--teal-600);">Mitra</span></span>
+                <span>Medic<span style="color: var(--theme-accent);">Mitra</span></span>
             </a>
             
             <div class="topbar-breadcrumbs">
                 <span>/</span>
-                <span style="color: var(--slate-700); font-weight: 600;">Clinical Workspace</span>
+                <span style="color: var(--text-primary); font-weight: 600;">Clinical Workspace</span>
                 <span>/</span>
-                <span>Imaging Intake</span>
+                <span>Radiograph Intake</span>
             </div>
         </div>
 
         <div class="topbar-right">
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span class="badge badge-emerald">
-                    <span class="status-dot dot-green"></span>
-                    AI Pipeline Active
-                </span>
-            </div>
+            <!-- Theme Toggle Button -->
+            <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Light / Dark Mode" title="Toggle Theme">
+                <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
 
-            <div class="doctor-profile-badge">
-                <div class="doctor-avatar">
-                    {{ current_user.name[0] if current_user and current_user.name else 'D' }}
-                </div>
-                <div>
-                    <div style="font-size: 0.825rem; font-weight: 700; color: var(--slate-900);">
-                        Dr. {{ current_user.name if current_user else 'Physician' }}
+            <!-- Enhanced Doctor Profile Trigger & Popover -->
+            <div class="doctor-profile-interactive">
+                <div class="doctor-profile-pill" onclick="toggleDoctorPopover(event)">
+                    <div class="doctor-avatar">
+                        {{ current_user.name[0] if current_user and current_user.name else 'D' }}
                     </div>
-                    <div style="font-size: 0.725rem; color: var(--slate-500);">
-                        {{ current_user.doctor_id if current_user else 'DOC-0000' }} &bull; {{ current_user.specialty if current_user else 'Radiology' }}
+                    <div>
+                        <div style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 0.35rem;">
+                            <span>{{ (current_user.name if current_user else 'Sarah Mitchell') | format_doctor_name }}</span>
+                            {% if current_user and current_user.is_verified %}
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--theme-accent)" stroke="var(--bg-surface)" stroke-width="2" title="Verified Physician"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            {% endif %}
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">
+                            {{ current_user.doctor_id if current_user else 'DOC-7749' }} &bull; {{ current_user.specialty if current_user else 'Radiology' }}
+                        </div>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-muted); margin-left: 0.25rem;"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+
+                <!-- Profile Popover Dropdown -->
+                <div id="doctor-popover" class="doctor-profile-popover">
+                    <div class="popover-header">
+                        <div class="popover-header-avatar">
+                            {{ current_user.name[0] if current_user and current_user.name else 'D' }}
+                        </div>
+                        <div class="popover-header-meta">
+                            <div class="popover-doc-name">
+                                {{ (current_user.name if current_user else 'Sarah Mitchell, M.D.') | format_doctor_name }}
+                            </div>
+                            <div class="popover-doc-email">
+                                {{ current_user.email if current_user else 'doctor@medicmitra.com' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Structured Credentials List -->
+                    <div class="popover-credentials-section">
+                        <!-- License ID -->
+                        <div class="popover-cred-card">
+                            <div class="popover-cred-icon">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><line x1="15" y1="8" x2="17" y2="8"/><line x1="15" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+                            </div>
+                            <div class="popover-cred-info">
+                                <span class="popover-cred-label">Medical License ID</span>
+                                <span class="popover-cred-value" style="font-family: monospace; letter-spacing: 0.04em;">{{ current_user.doctor_id if current_user else 'DOC-7749' }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Specialty -->
+                        <div class="popover-cred-card">
+                            <div class="popover-cred-icon">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>
+                            </div>
+                            <div class="popover-cred-info">
+                                <span class="popover-cred-label">Clinical Specialty</span>
+                                <span class="popover-cred-value">{{ current_user.specialty if current_user else 'Thoracic Radiology' }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Hospital Affiliation -->
+                        <div class="popover-cred-card">
+                            <div class="popover-cred-icon">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/><line x1="10" y1="9" x2="14" y2="9"/><line x1="12" y1="7" x2="12" y2="11"/></svg>
+                            </div>
+                            <div class="popover-cred-info">
+                                <span class="popover-cred-label">Hospital Affiliation</span>
+                                <span class="popover-cred-value">{{ current_user.hospital if current_user and current_user.hospital else 'MedicMitra Medical Institute' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="popover-footer">
+                        <a href="{{ url_for('logout') }}" class="btn-popover-signout">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            <span>Sign Out Securely</span>
+                        </a>
                     </div>
                 </div>
             </div>
-
-            <a href="{{ url_for('logout') }}" class="btn btn-outline btn-sm" title="Sign out securely">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                Sign Out
-            </a>
         </div>
     </div>
 </header>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <!-- Quick Performance & System Status Bar -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div>
-                <div class="stat-label">Total Scans Evaluated</div>
-                <div class="stat-value">{{ stats.total_scans }}</div>
-            </div>
-            <div style="width: 42px; height: 42px; background: var(--teal-50); color: var(--teal-600); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div>
-                <div class="stat-label">Avg. Opacity Contrast</div>
-                <div class="stat-value text-teal">{{ stats.avg_confidence }}%</div>
-            </div>
-            <div style="width: 42px; height: 42px; background: var(--emerald-50); color: var(--emerald-600); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div>
-                <div class="stat-label">Analysis Engine</div>
-                <div style="font-size: 1.05rem; font-weight: 700; color: var(--slate-800); margin-top: 0.25rem;">BFS & Matrix Traversal</div>
-            </div>
-            <div style="width: 42px; height: 42px; background: var(--blue-50); color: var(--blue-600); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div>
-                <div class="stat-label">ROI Segmentation</div>
-                <div style="font-size: 1.05rem; font-weight: 700; color: var(--emerald-600); margin-top: 0.25rem;">Deterministic Core</div>
-            </div>
-            <div style="width: 42px; height: 42px; background: var(--emerald-50); color: var(--emerald-600); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-            </div>
-        </div>
-    </div>
-
+<div class="container" style="padding-top: 2rem;">
     <!-- Main Workspace Two-Column Layout -->
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
         <!-- Left: Upload & Intake Card -->
         <div class="card">
             <div class="card-header">
                 <div>
-                    <h3>Patient Scan Intake & Analysis</h3>
-                    <p style="font-size: 0.875rem; margin-top: 0.25rem;">Upload radiological scan to trigger multi-stage preprocessing, BFS connected-component extraction, and statistical anomaly evaluation.</p>
+                    <h3>Thoracic Radiograph Intake &amp; Analysis</h3>
+                    <p style="font-size: 0.875rem; margin-top: 0.2rem; color: var(--text-muted);">
+                        Submit patient scan to initiate contrast enhancement (CLAHE), high-density thresholding, and morphological cluster segmentation.
+                    </p>
                 </div>
-                <span class="badge badge-teal">Step 1 of 2</span>
             </div>
 
             <form action="{{ url_for('analyze') }}" method="POST" enctype="multipart/form-data" id="analysis-form">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
                     <div class="form-group" style="margin-bottom: 0;">
-                        <label class="form-label" for="patient_id">Patient Identifier / Record #</label>
+                        <label class="form-label" for="patient_id">Patient Identifier / Accession #</label>
                         <input type="text" id="patient_id" name="patient_id" class="form-input" placeholder="e.g. PT-2026-104" value="PT-{{ range(1000, 9999) | random }}">
                     </div>
 
@@ -122,7 +141,6 @@
                             <option value="Chest X-Ray (PA View)">Chest X-Ray (PA View)</option>
                             <option value="Chest X-Ray (AP View)">Chest X-Ray (AP View)</option>
                             <option value="Computed Tomography (CT Thorax)">Computed Tomography (CT Thorax)</option>
-                            <option value="Brain Magnetic Resonance (MRI)">Brain Magnetic Resonance (MRI)</option>
                         </select>
                     </div>
                 </div>
@@ -133,35 +151,35 @@
                     
                     <div id="upload-prompt">
                         <div class="upload-icon-circle">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                         </div>
-                        <div style="font-size: 1.1rem; font-weight: 700; color: var(--slate-800);">
-                            Click to upload or drag & drop medical scan
+                        <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary);">
+                            Click to upload or drag &amp; drop patient radiograph
                         </div>
-                        <p style="font-size: 0.85rem; margin-top: 0.35rem;">
-                            Supports DICOM slices, high-res PNG, JPEG, and TIFF (up to 16MB)
+                        <p style="font-size: 0.875rem; margin-top: 0.25rem; color: var(--text-muted);">
+                            Accepts DICOM, high-res PNG, JPEG, and TIFF (up to 16MB)
                         </p>
                     </div>
 
                     <!-- Live Image Preview Card -->
                     <div id="preview-box" class="preview-container">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                            <span style="font-size: 0.825rem; font-weight: 700; color: var(--teal-700);">Scan Loaded For Analysis</span>
+                            <span style="font-size: 0.875rem; font-weight: 600; color: var(--theme-accent);">Scan Ready for Radiometric Analysis</span>
                             <button type="button" class="btn btn-danger btn-sm" onclick="clearFileSelection(event)">Remove</button>
                         </div>
                         <img id="preview-img" class="preview-thumbnail" src="#" alt="Scan Preview">
-                        <div id="file-info" style="font-size: 0.775rem; color: var(--slate-500); text-align: center; margin-top: 0.5rem;"></div>
+                        <div id="file-info" style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.5rem;"></div>
                     </div>
                 </div>
 
                 <div class="form-group" style="margin-top: 1.25rem;">
-                    <label class="form-label" for="clinical_notes">Clinical Indications & Patient Symptoms (Optional)</label>
-                    <textarea id="clinical_notes" name="clinical_notes" class="form-textarea" rows="2" placeholder="e.g. 48-year-old presenting with dyspnea, fever, and persistent rales in right lower base..."></textarea>
+                    <label class="form-label" for="clinical_notes">Clinical Indications &amp; Presentation Notes</label>
+                    <textarea id="clinical_notes" name="clinical_notes" class="form-textarea" rows="2" placeholder="e.g. 52-year-old presenting with dyspnea, fever, productive cough, and dullness to percussion..."></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    Run Algorithmic &amp; BFS Matrix Analysis
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Execute Radiometric Analysis &amp; Generate Report
                 </button>
             </form>
         </div>
@@ -170,113 +188,146 @@
         <div style="display: flex; flex-direction: column; gap: 1.5rem;">
             <div class="card">
                 <div class="card-header">
-                    <h4>Clinical Pipeline Protocol</h4>
-                    <span class="badge badge-emerald">Automated</span>
+                    <h4>Radiometric Processing Pipeline</h4>
                 </div>
 
                 <ul style="list-style: none; display: flex; flex-direction: column; gap: 1.15rem; font-size: 0.875rem;">
                     <li style="display: flex; gap: 0.75rem;">
-                        <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--teal-50); color: var(--teal-600); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
+                        <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--theme-accent-subtle); color: var(--theme-accent); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 0.75rem;">1</div>
                         <div>
-                            <strong style="color: var(--slate-900);">Quality & Integrity Validation</strong>
-                            <p style="font-size: 0.8rem; margin-top: 0.15rem;">Automated validation checks pixel depth, histogram distribution, and motion artifacts.</p>
+                            <strong style="color: var(--text-primary); font-size: 0.875rem;">Contrast Equalization (CLAHE)</strong>
+                            <p style="font-size: 0.75rem; margin-top: 0.15rem; color: var(--text-muted);">Applies adaptive histogram optimization to enhance tissue contrast and subtle infiltrate margins.</p>
                         </div>
                     </li>
 
                     <li style="display: flex; gap: 0.75rem;">
-                        <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--teal-50); color: var(--teal-600); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
+                        <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--theme-accent-subtle); color: var(--theme-accent); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 0.75rem;">2</div>
                         <div>
-                            <strong style="color: var(--slate-900);">BFS Component Analysis (DSA)</strong>
-                            <p style="font-size: 0.8rem; margin-top: 0.15rem;">Traverses the 2D pixel grid graph using 8-connected BFS to detect contiguous anomaly clusters.</p>
+                            <strong style="color: var(--text-primary); font-size: 0.875rem;">High-Density Opacity Thresholding</strong>
+                            <p style="font-size: 0.75rem; margin-top: 0.15rem; color: var(--text-muted);">Isolates high-attenuation pixels exceeding transparent lung baseline thresholds.</p>
                         </div>
                     </li>
 
                     <li style="display: flex; gap: 0.75rem;">
-                        <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--teal-50); color: var(--teal-600); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
+                        <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--theme-accent-subtle); color: var(--theme-accent); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 0.75rem;">3</div>
                         <div>
-                            <strong style="color: var(--slate-900);">ROI Bounding Box Generation</strong>
-                            <p style="font-size: 0.8rem; margin-top: 0.15rem;">Extracts coordinates and marks detected regions of interest on the scan without black-box ML.</p>
+                            <strong style="color: var(--text-primary); font-size: 0.875rem;">Morphological Cluster Segmentation</strong>
+                            <p style="font-size: 0.75rem; margin-top: 0.15rem; color: var(--text-muted);">Connected-component grouping segments contiguous focal consolidation regions.</p>
                         </div>
                     </li>
 
                     <li style="display: flex; gap: 0.75rem;">
-                        <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--teal-50); color: var(--teal-600); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">4</div>
+                        <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--theme-accent-subtle); color: var(--theme-accent); display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 0.75rem;">4</div>
                         <div>
-                            <strong style="color: var(--slate-900);">Statistical Evaluation</strong>
-                            <p style="font-size: 0.8rem; margin-top: 0.15rem;">Computes mathematical variance and intensity deviation against clinical thresholds.</p>
+                            <strong style="color: var(--text-primary); font-size: 0.875rem;">2-Page Diagnostic Report Generation</strong>
+                            <p style="font-size: 0.75rem; margin-top: 0.15rem; color: var(--text-muted);">Compiles quantitative radiomics, plain-language patient explanations, and signature attestation.</p>
                         </div>
                     </li>
                 </ul>
             </div>
 
-            <div class="card" style="background: linear-gradient(135deg, #f0fdfa, #eff6ff); border-color: var(--teal-100);">
-                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--teal-600)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    <span style="font-weight: 700; font-size: 0.95rem; color: var(--slate-800);">Physician Review Required</span>
+            <div class="card" style="background: var(--bg-subtle); border-color: var(--border-hairline);">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--theme-accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary);">Clinical Decision Support</span>
                 </div>
-                <p style="font-size: 0.825rem; color: var(--slate-600); line-height: 1.5;">
-                    MedicMitra acts strictly as a computer-aided triage and decision support system. Final diagnostic sign-off must always be executed by a certified physician.
+                <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
+                    Image computing metrics aid physician triage. Final diagnostic sign-off must always be rendered by a certified medical practitioner.
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- Recent Diagnostic History Table -->
+    <!-- Diagnostic History Table -->
     <div class="card">
         <div class="card-header">
             <div>
-                <h3>Recent Clinical Evaluations</h3>
-                <p style="font-size: 0.85rem; margin-top: 0.25rem;">Previously analyzed scans and verified physician diagnostic records.</p>
+                <h3>Evaluated Diagnostic Reports</h3>
+                <p style="font-size: 0.875rem; margin-top: 0.2rem; color: var(--text-muted);">
+                    Audited patient radiograph evaluations and certified medical summaries.
+                </p>
             </div>
-            <a href="{{ url_for('results') }}" class="btn btn-outline btn-sm">View Latest Analysis &rarr;</a>
+            {% if recent_scans %}
+                <a href="{{ url_for('results') }}" class="btn btn-outline btn-sm">View Latest Report &rarr;</a>
+            {% endif %}
         </div>
 
-        <div class="table-responsive">
-            <table class="clinical-table">
-                <thead>
-                    <tr>
-                        <th>Patient ID</th>
-                        <th>Scan Modality</th>
-                        <th>Condition Prediction</th>
-                        <th>Contrast Prominence</th>
-                        <th>Reliability Index</th>
-                        <th>Evaluation Date</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for scan in recent_scans %}
-                    <tr>
-                        <td style="font-weight: 700; color: var(--slate-900);">{{ scan.patient_id }}</td>
-                        <td>{{ scan.modality }}</td>
-                        <td>
-                            {% if 'Normal' in scan.condition_predicted %}
-                                <span class="badge badge-emerald">{{ scan.condition_predicted }}</span>
-                            {% elif 'Pneumonia' in scan.condition_predicted %}
-                                <span class="badge badge-rose">{{ scan.condition_predicted }}</span>
-                            {% else %}
-                                <span class="badge badge-amber">{{ scan.condition_predicted }}</span>
-                            {% endif %}
-                        </td>
-                        <td style="font-weight: 600;">{{ scan.confidence_score }}%</td>
-                        <td>
-                            <span class="badge badge-teal">{{ scan.stability }} ({{ scan.reliability_index }})</span>
-                        </td>
-                        <td style="color: var(--slate-500); font-size: 0.825rem;">{{ scan.created_at.strftime('%b %d, %Y - %H:%M') }}</td>
-                        <td>
-                            <a href="{{ url_for('results', scan_id=scan.id) }}" class="btn btn-outline btn-sm" style="padding: 0.25rem 0.65rem;">View Report</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        {% if recent_scans %}
+            <div class="table-responsive">
+                <table class="clinical-table">
+                    <thead>
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Modality</th>
+                            <th style="text-align: center;">Pathology Finding</th>
+                            <th>Opacity Contrast</th>
+                            <th style="text-align: center;">Localized Regions</th>
+                            <th>Study Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for scan in recent_scans %}
+                        <tr>
+                            <td style="font-weight: 600; color: var(--text-primary);">{{ scan.patient_id }}</td>
+                            <td>{{ scan.modality }}</td>
+                            <td style="text-align: center;">
+                                {% if 'Normal' in scan.condition_predicted %}
+                                    <span class="badge badge-emerald">{{ scan.condition_predicted }}</span>
+                                {% elif 'Abnormal' in scan.condition_predicted or 'Pneumonia' in scan.condition_predicted %}
+                                    <span class="badge badge-rose">{{ scan.condition_predicted }}</span>
+                                {% else %}
+                                    <span class="badge badge-amber">{{ scan.condition_predicted }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-weight: 600;">{{ scan.confidence_score }}%</td>
+                            <td style="text-align: center;">
+                                <span class="badge badge-teal">{{ scan.stability }}</span>
+                            </td>
+                            <td style="color: var(--text-muted); font-size: 0.75rem;">{{ scan.created_at.strftime('%b %d, %Y - %H:%M') }}</td>
+                            <td>
+                                <a href="{{ url_for('results', scan_id=scan.id) }}" class="btn btn-outline btn-sm" style="padding: 0.25rem 0.65rem;">View Report</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <!-- Elegant Empty State When No Real Scans Exist -->
+            <div class="empty-state-box">
+                <div class="empty-state-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <h4 style="color: var(--text-primary); margin-bottom: 0.35rem;">No Diagnostic Scans Recorded Yet</h4>
+                <p style="font-size: 0.875rem; max-width: 440px; margin: 0 auto; color: var(--text-muted);">
+                    Upload a patient radiograph using the intake panel above to run radiometric analysis and generate your first certified clinical report.
+                </p>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+    // Doctor Profile Dropdown Popover
+    function toggleDoctorPopover(e) {
+        e.stopPropagation();
+        const popover = document.getElementById('doctor-popover');
+        popover.classList.toggle('active');
+    }
+
+    document.addEventListener('click', function(e) {
+        const popover = document.getElementById('doctor-popover');
+        if (popover && popover.classList.contains('active')) {
+            if (!popover.contains(e.target)) {
+                popover.classList.remove('active');
+            }
+        }
+    });
+
+    // Drag and Drop Intake
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('scan_image');
     const previewBox = document.getElementById('preview-box');
@@ -284,7 +335,6 @@
     const uploadPrompt = document.getElementById('upload-prompt');
     const fileInfo = document.getElementById('file-info');
 
-    // Drag and Drop Effects
     ['dragenter', 'dragover'].forEach(eventName => {
         dropZone.addEventListener(eventName, (e) => {
             e.preventDefault();
@@ -327,7 +377,7 @@
         reader.readAsDataURL(file);
 
         const fileSizeKB = (file.size / 1024).toFixed(1);
-        fileInfo.innerHTML = `<strong>${file.name}</strong> &bull; ${fileSizeKB} KB &bull; Ready for Algorithmic Analysis`;
+        fileInfo.innerHTML = `<strong>${file.name}</strong> &bull; ${fileSizeKB} KB &bull; Verified Format`;
     }
 
     function clearFileSelection(e) {

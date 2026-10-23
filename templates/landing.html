@@ -1,19 +1,43 @@
 {% extends 'base.html' %}
 
-{% block title %}MedicMitra | Explainable AI Clinical Diagnostics{% endblock %}
+{% block title %}MedicMitra | Clinical Decision Support & Radiomics{% endblock %}
 
+{% block nav %}
+<header class="workspace-topbar">
+    <div class="workspace-topbar-inner">
+        <div class="topbar-left">
+            <a href="{{ url_for('index') }}" class="brand-logo" title="MedicMitra Home">
+                <div class="brand-badge-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+                <span>Medic<span style="color: var(--theme-accent);">Mitra</span></span>
+            </a>
+        </div>
+
+        <div class="topbar-right">
+            <!-- Theme Toggle Button -->
+            <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Light / Dark Mode" title="Toggle Theme">
+                <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <a href="{{ url_for('login') }}" class="btn btn-outline btn-sm">Doctor Portal</a>
+            <a href="{{ url_for('signup') }}" class="btn btn-primary btn-sm">Register Practice</a>
+        </div>
+    </div>
+</header>
+{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <section style="padding: 4rem 1.5rem 5rem 1.5rem; text-align: center; position: relative; overflow: hidden;">
     <div style="max-width: 900px; margin: 0 auto;">
-        <h1 style="margin-bottom: 1.5rem; color: var(--slate-900);">
+        <h1 style="margin-bottom: 1.5rem;">
             Explainable Image Analysis for <br>
-            <span style="background: linear-gradient(135deg, var(--teal-600), var(--blue-600)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Medical Imaging Specialists</span>
+            <span class="hero-highlight">Medical Imaging Specialists</span>
         </h1>
 
-        <p style="font-size: 1.15rem; max-width: 720px; margin: 0 auto 2.5rem auto; color: var(--slate-600);">
-            Empower clinicians and radiologists with algorithmic pixel preprocessing, BFS-driven region of interest extraction, and automated mathematical diagnostic summaries with zero black-box guesswork.
+        <p style="font-size: 1.05rem; max-width: 720px; margin: 0 auto 2.5rem auto; color: var(--text-secondary);">
+            Empower clinicians and radiologists with algorithmic pixel preprocessing, morphological region-of-interest analysis, and automated mathematical diagnostic summaries with zero black-box guesswork.
         </p>
 
         <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
@@ -31,66 +55,60 @@
 
     <!-- Interactive Hero Preview Widget -->
     <div style="max-width: 1040px; margin: 3.5rem auto 0 auto;">
-        <div class="card card-hover" style="border: 1px solid var(--slate-200); box-shadow: var(--shadow-xl); padding: 1.5rem; text-align: left; background: var(--white);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--slate-100); padding-bottom: 0.75rem;">
+        <div class="card card-hover" style="text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-hairline); padding-bottom: 0.75rem;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
-                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #f59e0b;"></div>
-                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></div>
-                    <span style="font-size: 0.85rem; font-weight: 600; color: var(--slate-500); margin-left: 0.5rem;">Clinical Image Analysis Engine // Pipeline Preview</span>
+                    <div style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></div>
+                    <div style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></div>
+                    <div style="width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></div>
+                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted); margin-left: 0.5rem;">Clinical Image Analysis Engine // Pipeline Preview</span>
                 </div>
-                <span class="badge badge-emerald">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                    BFS Matrix Traversal Verified
-                </span>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; align-items: center;">
-                <div style="background: var(--slate-900); border-radius: var(--radius-md); padding: 1.5rem; color: white; position: relative; overflow: hidden; min-height: 240px; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; opacity: 0.15; background-image: radial-gradient(#14b8a6 1px, transparent 1px); background-size: 16px 16px;"></div>
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border-hairline); border-radius: var(--radius-md); padding: 1.5rem; color: var(--text-primary); position: relative; overflow: hidden; min-height: 240px; display: flex; flex-direction: column; justify-content: space-between;">
                     <div style="display: flex; justify-content: space-between; position: relative; z-index: 2;">
-                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--teal-400);">Scan Modality</span>
-                        <span style="font-size: 0.75rem; color: var(--slate-400);">ID: CXR-9042-PA</span>
+                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--theme-accent); font-weight: 600;">Scan Modality</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">ID: CXR-9042-PA</span>
                     </div>
                     <div style="position: relative; z-index: 2; text-align: center; margin: 1.5rem 0;">
-                        <div style="display: inline-block; padding: 0.75rem 1.5rem; border: 2px dashed rgba(20, 184, 166, 0.4); border-radius: var(--radius-md); background: rgba(15, 23, 42, 0.6);">
-                            <span style="font-size: 0.9rem; color: var(--teal-100); font-weight: 600;">[Chest Radiograph PA View]</span>
-                            <div style="font-size: 0.75rem; color: var(--slate-400); margin-top: 0.25rem;">Bilateral lung fields digitized at 2048 &times; 2048</div>
+                        <div style="display: inline-block; padding: 0.75rem 1.5rem; border: 2px dashed var(--theme-accent); border-radius: var(--radius-md); background: var(--theme-accent-subtle);">
+                            <span style="font-size: 0.875rem; color: var(--theme-accent); font-weight: 600;">[Chest Radiograph PA View]</span>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Bilateral lung fields digitized at 2048 &times; 2048</div>
                         </div>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;">
-                        <span class="badge badge-teal">Preprocessed & Normalized</span>
-                        <span style="font-size: 0.75rem; color: var(--slate-400);">SNR: 28.4 dB</span>
+                        <span style="font-size: 0.75rem; color: var(--theme-accent); font-weight: 600;">Preprocessed &amp; Normalized</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">SNR: 28.4 dB</span>
                     </div>
                 </div>
 
                 <div>
-                    <h3 style="margin-bottom: 0.5rem; color: var(--slate-900);">Instant Diagnostic Breakdown</h3>
-                    <p style="font-size: 0.9rem; margin-bottom: 1.25rem;">Real-time automated feature map analysis with physician sign-off protection.</p>
+                    <h3 style="margin-bottom: 0.5rem;">Instant Diagnostic Breakdown</h3>
+                    <p style="font-size: 0.875rem; margin-bottom: 1.25rem;">Real-time automated feature map analysis with physician sign-off protection.</p>
                     
                     <div style="margin-bottom: 1rem;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">
                             <span>Detected Opacity Prominence</span>
-                            <span class="text-teal font-bold">94.2%</span>
+                            <span style="color: var(--theme-accent); font-weight: 700;">94.2%</span>
                         </div>
-                        <div class="confidence-bar-wrapper">
-                            <div class="confidence-bar-fill" style="width: 94.2%;"></div>
+                        <div style="background: var(--bg-subtle); border-radius: 9999px; height: 7px; overflow: hidden;">
+                            <div style="width: 94.2%; height: 100%; background: var(--theme-accent);"></div>
                         </div>
                     </div>
 
                     <div style="margin-bottom: 1rem;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">
-                            <span>BFS Anatomical Cluster Index</span>
-                            <span style="color: var(--emerald-600); font-weight: 700;">0.92 (Optimal)</span>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">
+                            <span>Morphological Cluster Index</span>
+                            <span style="color: var(--theme-accent); font-weight: 700;">0.92 (Optimal)</span>
                         </div>
-                        <div class="confidence-bar-wrapper">
-                            <div class="confidence-bar-fill" style="width: 92%; background: linear-gradient(90deg, #10b981, #059669);"></div>
+                        <div style="background: var(--bg-subtle); border-radius: 9999px; height: 7px; overflow: hidden;">
+                            <div style="width: 92%; height: 100%; background: var(--theme-accent);"></div>
                         </div>
                     </div>
 
                     <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
                         <a href="{{ url_for('login') }}" class="btn btn-primary btn-sm">Try Live Demo Scan</a>
-                        <span class="badge badge-slate" style="align-self: center;">Pre-seeded Doctor Credentials Available</span>
                     </div>
                 </div>
             </div>
@@ -108,63 +126,71 @@
     <div class="features-grid-2x2">
         <!-- Card 1 -->
         <div class="card card-hover feature-card-centered">
-            <div style="width: 52px; height: 52px; background: var(--teal-50); color: var(--teal-600); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div style="width: 48px; height: 48px; background: var(--theme-accent-subtle); color: var(--theme-accent); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M2 12h20M12 2v20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14"/>
                 </svg>
             </div>
-            <h3 style="font-size: 1.2rem; margin-bottom: 0.65rem;">Multi-Modal Vision Support</h3>
-            <p style="font-size: 0.925rem;">Supports Chest Radiographs (AP/PA), Computed Tomography (CT), and MRI DICOM slices with automated pixel intensity normalization.</p>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Multi-Modal Vision Support</h3>
+            <p style="font-size: 0.875rem;">Supports Chest Radiographs (AP/PA), Computed Tomography (CT), and MRI DICOM slices with automated pixel intensity normalization.</p>
         </div>
 
         <!-- Card 2 -->
         <div class="card card-hover feature-card-centered">
-            <div style="width: 52px; height: 52px; background: var(--blue-50); color: var(--blue-600); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div style="width: 48px; height: 48px; background: var(--theme-accent-subtle); color: var(--theme-accent); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/>
                 </svg>
             </div>
-            <h3 style="font-size: 1.2rem; margin-bottom: 0.65rem;">Deterministic ROI Extraction</h3>
-            <p style="font-size: 0.925rem;">Generates deterministic bounding boxes showing exact anatomical regions influencing the algorithmic evaluation.</p>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Deterministic ROI Extraction</h3>
+            <p style="font-size: 0.875rem;">Generates deterministic bounding boxes showing exact anatomical regions influencing the algorithmic evaluation.</p>
         </div>
 
         <!-- Card 3 -->
         <div class="card card-hover feature-card-centered">
-            <div style="width: 52px; height: 52px; background: var(--emerald-50); color: var(--emerald-600); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div style="width: 48px; height: 48px; background: var(--theme-accent-subtle); color: var(--theme-accent); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
             </div>
-            <h3 style="font-size: 1.2rem; margin-bottom: 0.65rem;">Clinical Reliability Verification</h3>
-            <p style="font-size: 0.925rem;">Built-in signal-to-noise checks, out-of-distribution alerts, and prediction stability scoring ensure clinical safety.</p>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Clinical Reliability Verification</h3>
+            <p style="font-size: 0.875rem;">Built-in signal-to-noise checks, out-of-distribution alerts, and prediction stability scoring ensure clinical safety.</p>
         </div>
 
         <!-- Card 4 -->
         <div class="card card-hover feature-card-centered">
-            <div style="width: 52px; height: 52px; background: #faf5ff; color: #9333ea; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div style="width: 48px; height: 48px; background: var(--theme-accent-subtle); color: var(--theme-accent); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
                 </svg>
             </div>
-            <h3 style="font-size: 1.2rem; margin-bottom: 0.65rem;">Automated Diagnostic Reports</h3>
-            <p style="font-size: 0.925rem;">Generate physician-signed PDF reports with patient metadata, severity indexes, ROI bounding box overlays, and notes.</p>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Automated Diagnostic Reports</h3>
+            <p style="font-size: 0.875rem;">Generate physician-signed PDF reports with patient metadata, severity indexes, ROI bounding box overlays, and notes.</p>
         </div>
     </div>
 </section>
 
-<!-- Footer -->
-<footer style="background: var(--white); border-top: 1px solid var(--slate-200); padding: 3rem 1.5rem; text-align: center; margin-top: auto;">
-    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <div class="brand-badge-icon" style="width: 28px; height: 28px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+<!-- Footer (Clean & Balanced) -->
+<footer class="landing-footer">
+    <div class="landing-footer-container">
+        <!-- Left: Brand & Legal Notice -->
+        <div class="landing-footer-brand-col">
+            <div class="landing-footer-brand">
+                <div class="brand-badge-icon" style="width: 28px; height: 28px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+                <span>MedicMitra Diagnostics</span>
             </div>
-            <span style="font-weight: 700; color: var(--slate-800);">MedicMitra Diagnostics</span>
+            <p class="landing-footer-copy">
+                &copy; 2026 MedicMitra Systems. Clinical Decision Support Protocol. All rights reserved.
+            </p>
         </div>
-        <p style="font-size: 0.85rem; color: var(--slate-500); margin: 0;">&copy; 2026 MedicMitra Systems. Clinical Decision Support Protocol. All rights reserved.</p>
-        <div style="display: flex; gap: 1rem;">
-            <a href="{{ url_for('login') }}" style="font-size: 0.85rem; font-weight: 600; color: var(--teal-600);">Doctor Portal</a>
-            <a href="{{ url_for('signup') }}" style="font-size: 0.85rem; font-weight: 600; color: var(--slate-600);">Register</a>
+
+        <!-- Right: Navigation Links -->
+        <div class="landing-footer-nav">
+            <a href="{{ url_for('login') }}" class="landing-footer-link">Doctor Portal</a>
+            <span class="landing-footer-divider">&bull;</span>
+            <a href="{{ url_for('signup') }}" class="landing-footer-link">Register Practice</a>
         </div>
     </div>
 </footer>
