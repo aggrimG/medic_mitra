@@ -107,8 +107,6 @@ def format_doctor_name(name):
 def favicon():
     return '', 204
 
-@app.route('/api/index')
-@app.route('/api')
 @app.route('/')
 def index():
     """Factual, High-Craft Medical Landing Page"""
