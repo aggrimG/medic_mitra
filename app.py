@@ -103,9 +103,13 @@ def format_doctor_name(name):
 
 # ----------------- ROUTES -----------------
 
-@app.route('/')
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
 @app.route('/api/index')
 @app.route('/api')
+@app.route('/')
 def index():
     """Factual, High-Craft Medical Landing Page"""
     return render_template('landing.html')
@@ -367,5 +371,5 @@ try:
 except Exception as e:
     app.logger.warning(f"Database initialization deferred: {e}")
 
-if __name__ == '__main__':
+if __name__ == '__main__' and not os.environ.get('VERCEL'):
     app.run(debug=True)
