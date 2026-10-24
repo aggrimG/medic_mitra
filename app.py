@@ -104,6 +104,8 @@ def format_doctor_name(name):
 # ----------------- ROUTES -----------------
 
 @app.route('/')
+@app.route('/api/index')
+@app.route('/api')
 def index():
     """Factual, High-Craft Medical Landing Page"""
     return render_template('landing.html')
