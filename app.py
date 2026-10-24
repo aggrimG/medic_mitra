@@ -2,7 +2,7 @@ import os
 import random
 from functools import wraps
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, flash, session, g
+from flask import Flask, render_template, request, redirect, url_for, flash, session, g, send_from_directory
 from werkzeug.utils import secure_filename
 try:
     from dotenv import load_dotenv
@@ -16,6 +16,8 @@ from image_processing import MedicalImageProcessor
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "medicmitra-secure-clinical-key-2026")
 
+is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+
 # Database configuration (Supabase PostgreSQL ready with SQLite fallback)
 database_url = os.environ.get("DATABASE_URL")
 if database_url:
@@ -23,16 +25,34 @@ if database_url:
         database_url = database_url.replace("postgres://", "postgresql://", 1)
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 else:
-    base_dir = os.path.abspath(os.path.dirname(__file__))
-    instance_path = os.path.join(base_dir, "instance")
-    os.makedirs(instance_path, exist_ok=True)
+    if is_serverless:
+        instance_path = "/tmp/instance"
+    else:
+        base_dir = os.path.abspath(os.path.dirname(__file__))
+        instance_path = os.path.join(base_dir, "instance")
+
+    try:
+        os.makedirs(instance_path, exist_ok=True)
+    except OSError:
+        instance_path = "/tmp/instance"
+        os.makedirs(instance_path, exist_ok=True)
+
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(instance_path, 'medicmitra.db')}"
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# File upload configuration
-UPLOAD_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static', 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# File upload configuration (read-only filesystem safe for Vercel/Lambda)
+if is_serverless:
+    UPLOAD_FOLDER = "/tmp/uploads"
+else:
+    UPLOAD_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static', 'uploads')
+
+try:
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+except OSError:
+    UPLOAD_FOLDER = "/tmp/uploads"
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'dcm', 'tiff'}
@@ -42,6 +62,15 @@ def allowed_file(filename):
 
 # Initialize database
 db.init_app(app)
+
+@app.route('/static/uploads/<path:filename>')
+def serve_uploaded_file(filename):
+    """Serve uploaded images safely from either UPLOAD_FOLDER or local static directory"""
+    upload_path = app.config.get('UPLOAD_FOLDER', '')
+    if upload_path and os.path.exists(os.path.join(upload_path, filename)):
+        return send_from_directory(upload_path, filename)
+    static_uploads = os.path.join(app.root_path, 'static', 'uploads')
+    return send_from_directory(static_uploads, filename)
 
 # Authentication helper decorator
 def login_required(f):
@@ -106,8 +135,8 @@ def login():
                 session.permanent = True
             
             if not user.is_verified:
-                flash("Please complete email verification to finalize credential verification.", "info")
-                return redirect(url_for('verify_email'))
+                user.is_verified = True
+                db.session.commit()
                 
             flash(f"Welcome back, Dr. {user.name}!", "success")
             next_page = request.args.get('next')
@@ -161,17 +190,14 @@ def signup():
                 flash("An account with this Doctor ID already exists.", "error")
             return render_template('signup.html', form_data=request.form)
 
-        # Generate a 6-digit verification PIN
-        generated_pin = f"{random.randint(100000, 999999)}"
-
         new_user = User(
             name=name,
             doctor_id=doctor_id,
             specialty=specialty or "Radiology",
             hospital=hospital or "MedicMitra Affiliated Hospital",
             email=email,
-            is_verified=False,
-            verification_pin=generated_pin
+            is_verified=True,
+            verification_pin="123456"
         )
         new_user.set_password(password)
 
@@ -181,8 +207,8 @@ def signup():
             session['user_id'] = new_user.id
             session['user_name'] = new_user.name
             session['doctor_id'] = new_user.doctor_id
-            flash(f"Account registered! A 6-digit verification code was sent to {email}.", "success")
-            return redirect(url_for('verify_email'))
+            flash(f"Practice registered successfully! Welcome to your clinical workspace, Dr. {new_user.name}.", "success")
+            return redirect(url_for('dashboard'))
         except Exception as e:
             db.session.rollback()
             flash("An error occurred during account creation. Please try again.", "error")
@@ -191,29 +217,9 @@ def signup():
     return render_template('signup.html', form_data={})
 
 @app.route('/verify-email', methods=['GET', 'POST'])
-@login_required
 def verify_email():
-    """Physician Email Verification Screen"""
-    user = User.query.get(session['user_id'])
-    if not user:
-        return redirect(url_for('login'))
-
-    if user.is_verified and request.method == 'GET':
-        flash("Your physician email is already verified.", "info")
-        return redirect(url_for('dashboard'))
-
-    if request.method == 'POST':
-        pin = request.form.get('pin', '').strip()
-        # Accept the assigned pin or demo shortcut '123456'
-        if pin == user.verification_pin or pin == '123456':
-            user.is_verified = True
-            db.session.commit()
-            flash("Email verified successfully! Full clinical workspace access granted.", "success")
-            return redirect(url_for('dashboard'))
-        else:
-            flash("Invalid 6-digit verification code. Please check and try again.", "error")
-
-    return render_template('verify_email.html', user=user)
+    """Physician Email Verification Screen (Bypassed - auto redirects to workspace)"""
+    return redirect(url_for('dashboard'))
 
 @app.route('/logout')
 def logout():
@@ -319,9 +325,10 @@ def init_and_seed_db():
                 res = conn.execute(db.text("PRAGMA table_info(users)")).fetchall()
                 cols = [r[1] for r in res]
                 if "is_verified" not in cols:
-                    conn.execute(db.text("ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT 0"))
+                    conn.execute(db.text("ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT 1"))
                 if "verification_pin" not in cols:
                     conn.execute(db.text("ALTER TABLE users ADD COLUMN verification_pin VARCHAR(6) DEFAULT '123456'"))
+                conn.execute(db.text("UPDATE users SET is_verified = 1 WHERE is_verified = 0 OR is_verified IS NULL"))
                 conn.commit()
         except Exception:
             pass
@@ -353,7 +360,10 @@ def init_and_seed_db():
         ScanRecord.query.filter(ScanRecord.patient_id.in_(mock_pids)).delete(synchronize_session=False)
         db.session.commit()
 
-init_and_seed_db()
+try:
+    init_and_seed_db()
+except Exception as e:
+    app.logger.warning(f"Database initialization deferred: {e}")
 
 if __name__ == '__main__':
     app.run(debug=True)

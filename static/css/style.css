@@ -1746,17 +1746,31 @@ html[data-theme="light"] .hero-bg-image {
   position: absolute;
   border: 2px dashed var(--theme-accent);
   background: var(--theme-accent-subtle);
-  border-radius: 4px;
+  border-radius: 6px;
   width: 58%;
   height: 64%;
+  min-width: 130px;
+  min-height: 68px;
+  padding: 0.35rem 0.5rem;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  gap: 0.2rem;
   color: var(--theme-accent);
   font-size: 0.75rem;
   font-weight: 700;
   animation: radarBoxPulse 3s infinite ease-in-out;
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.radar-bounding-box span {
+  display: block;
+  text-align: center;
+  width: 100%;
+  line-height: 1.25;
 }
 
 @keyframes radarBoxPulse {

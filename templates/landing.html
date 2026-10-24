@@ -108,8 +108,8 @@
                     <div class="bento-telemetry-body">
                         <div class="telemetry-radar-canvas">
                             <div class="radar-bounding-box" id="bento-radar-box">
-                                <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85;">ROI TARGET</span>
-                                <span id="bento-box-label" style="font-size: 0.8rem;">[R: Lower Lobe]</span>
+                                <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85; display: block; text-align: center; width: 100%;">ROI TARGET</span>
+                                <span id="bento-box-label" style="font-size: 0.8rem; display: block; text-align: center; width: 100%;">[R: Lower Lobe]</span>
                             </div>
                         </div>
 
@@ -313,8 +313,8 @@
             snrBar.style.width = '55%';
             clustersVal.textContent = 'Unsegmented';
         } else if (mode === 'clusters') {
-            box.style.width = '42%';
-            box.style.height = '48%';
+            box.style.width = '52%';
+            box.style.height = '52%';
             label.textContent = '[Focal Consolidation]';
             opacityVal.textContent = '98.1%';
             opacityBar.style.width = '98.1%';

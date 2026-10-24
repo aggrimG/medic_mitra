@@ -14,7 +14,7 @@ class User(db.Model):
     specialty = db.Column(db.String(100), default='General Radiology')
     hospital = db.Column(db.String(150), default='MedicMitra Health Center')
     password_hash = db.Column(db.String(256), nullable=False)
-    is_verified = db.Column(db.Boolean, default=False)
+    is_verified = db.Column(db.Boolean, default=True)
     verification_pin = db.Column(db.String(6), default='123456')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

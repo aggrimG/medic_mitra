@@ -5,7 +5,6 @@ from collections import deque
 try:
     import cv2
     import numpy as np
-    import matplotlib.pyplot as plt
     HAS_CV2 = True
 except ImportError:
     HAS_CV2 = False
