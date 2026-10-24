@@ -22,18 +22,15 @@ class VercelWSGIMiddleware:
         if '__vercel_route=' in qs:
             params = urllib.parse.parse_qs(qs, keep_blank_values=True)
             routes = params.pop('__vercel_route', None)
+            environ['QUERY_STRING'] = urllib.parse.urlencode(params, doseq=True)
             if routes and routes[0]:
                 route = routes[0]
-                if not route.startswith('/'):
-                    route = '/' + route
-                environ['PATH_INFO'] = route
-            environ['QUERY_STRING'] = urllib.parse.urlencode(params, doseq=True)
-        else:
-            path = environ.get('PATH_INFO', '')
-            if path in ('/api/index', '/api/index/', '/api', '/api/'):
-                environ['PATH_INFO'] = '/'
-            elif path.startswith('/api/index/'):
-                environ['PATH_INFO'] = path[len('/api/index'):]
+                if not any(token in route for token in ('$1', ':path', ':path*')):
+                    if not route.startswith('/'):
+                        route = '/' + route
+                    environ['PATH_INFO'] = route
+        elif environ.get('PATH_INFO') in ('/api/index', '/api/index/', '/api', '/api/'):
+            environ['PATH_INFO'] = '/'
 
         return self.wsgi_app(environ, start_response)
 
